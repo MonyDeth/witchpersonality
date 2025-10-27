@@ -155,6 +155,7 @@ onMounted(() => {
   flex-direction: column;
   gap: 1rem;
   width: 100%;
+  font-size: 1rem;
 }
 
 .answer-button {
@@ -197,6 +198,13 @@ onMounted(() => {
 .next-button:hover:not(:disabled) {
   transform: translateY(-2px) scale(1.02);
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+
+}
+
+@media (max-width: 768px) {
+  .question-text {
+    font-size: 1.2rem;
+  }
 
 }
 </style>

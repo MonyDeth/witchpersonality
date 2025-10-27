@@ -17,6 +17,7 @@ const personalities = {
   1: { name: "Marie", description: "Thoughtful and introspective.", image: "/images/1-marie.png" },
   2: { name: "Lyda", description: "Outgoing and adventurous.", image: "/images/2-lyda.png" },
   3: { name: "Vanna", description: "Creative and curious.", image: "/images/3-vanna.png" },
+  4: { name: "Cat", description: "Meow Meow Meow... Meow!", image: "/images/4-cat.png" },
 };
 
 // Helper to preload images
@@ -69,8 +70,8 @@ onMounted(async () => {
 
 function flickerLogo() {
   const tl = gsap.timeline({ repeat: -1, yoyo: true });
-  tl.to(".logo", { opacity: 0.3, duration: 0.8, ease: "power1.inOut" })
-      .to(".logo", { opacity: 1, duration: 0.8, ease: "power1.inOut" });
+  tl.to(".logo-loader", { opacity: 0.3, duration: 0.8, ease: "power1.inOut" })
+      .to(".logo-loader", { opacity: 1, duration: 0.8, ease: "power1.inOut" });
 }
 
 function animateCardEntry() {
@@ -137,9 +138,9 @@ function initCard() {
 
 <template>
   <!-- LOADING SCREEN -->
-  <div v-if="loading" class="loading-screen">
-    <h1 class="title dm-serif-text-regular-italic">Gazing at the stars...</h1>
-    <img src="../assets/logo.png" alt="Logo" class="logo" />
+  <div v-if="loading" class="loading-screen ">
+    <img src="../assets/logo-loader.png" alt="Logo" class="logo-loader" />
+    <h3 class="title dm-serif-text-regular-italic">Gazing at the stars...</h3>
   </div>
 
   <!-- RESULT PAGE -->
@@ -173,7 +174,7 @@ function initCard() {
   z-index: 9999;
 }
 
-.logo {
+.logo-loader {
   width: 180px;
   opacity: 1;
   animation: flicker 1.6s infinite ease-in-out;
@@ -255,6 +256,37 @@ function initCard() {
     margin-top: 2rem;
     width: 90%;
   }
+  .cardCont {
+    width: 200px;
+    max-width: 90%;
+    height: 300px;
+    max-height: 80vh;
+    position: relative;
+    cursor: pointer;
+    margin-bottom: 2rem;
+  }
+
+  .character-name {
+    font-size: 1.8rem;
+  }
+  .character-description {
+    font-size: 1rem;
+  }
+
+  .result-container {
+    position: absolute;
+   left: 0;
+    top: 75%;
+    transform: translateY(-50%) translateX(220px);
+    background: #fff;
+    padding: 2rem;
+    color: #2a5bbd;
+    max-width: 750px;
+    min-width: 250px;
+    box-shadow: 8px 8px 0px rgba(0,0,0,0.4);
+    rotate: 4deg;
+  }
+
 }
 
 .result-container button {
