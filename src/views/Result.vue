@@ -115,7 +115,7 @@ function initCard() {
   <div class="page-container">
     <div class="cardCont" ref="cardRef">
       <div class="cardBack" :style="{ backgroundImage: `url(${character?.image})` }"></div>
-      <div class="cardFront" style="background-image: url('/src/assets/card-back.png')">
+      <div class="cardFront" style="background-image: url('images/card-back.png')">
         <div class="click-text dm-serif-text-regular-italic">Click to Reveal</div>
       </div>
     </div>
