@@ -6,6 +6,7 @@ import gsap from "gsap";
 const router = useRouter();
 const route = useRoute();
 
+const loading = ref(true);        // NEW: loading screen visibility
 const cardRef = ref(null);
 const resultRef = ref(null);
 const character = ref(null);
@@ -18,7 +19,17 @@ const personalities = {
   3: { name: "Vanna", description: "Creative and curious.", image: "/images/3-vanna.png" },
 };
 
-onMounted(() => {
+// Helper to preload images
+function preloadImage(src) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = src;
+    img.onload = resolve;
+    img.onerror = resolve;
+  });
+}
+
+onMounted(async () => {
   const answersQuery = route.query.answers;
   if (!answersQuery) {
     result.value = "No results available.";
@@ -41,11 +52,26 @@ onMounted(() => {
   character.value = personalities[maxKey];
   result.value = character.value.description;
 
-  nextTick(() => {
-    animateCardEntry(); // Animate card dropping in on mount
-    initCard();         // Initialize click/flip animation
-  });
+  // Preload character image before showing page
+  await preloadImage(character.value.image);
+
+  // Animate flicker while loading
+  flickerLogo();
+
+  // Simulate load delay for smooth transition
+  setTimeout(async () => {
+    loading.value = false;
+    await nextTick();
+    animateCardEntry();
+    initCard();
+  }, 2500);
 });
+
+function flickerLogo() {
+  const tl = gsap.timeline({ repeat: -1, yoyo: true });
+  tl.to(".logo", { opacity: 0.3, duration: 0.8, ease: "power1.inOut" })
+      .to(".logo", { opacity: 1, duration: 0.8, ease: "power1.inOut" });
+}
 
 function animateCardEntry() {
   const card = cardRef.value;
@@ -53,14 +79,13 @@ function animateCardEntry() {
 
   const tl = gsap.timeline();
 
-  // Card drops in from above with slight rotation and scale
   tl.from(card, {
     y: 400,
     opacity: 0,
     scale: 0.8,
     rotation: -5,
-    duration: .8,
-    ease: "power2.out"
+    duration: 0.8,
+    ease: "power2.out",
   });
 
   gsap.to(card, {
@@ -69,7 +94,7 @@ function animateCardEntry() {
     ease: "easeOut",
     yoyo: true,
     repeat: -1,
-    delay: 1.2
+    delay: 1.2,
   });
   gsap.to(result, {
     y: "-=15",
@@ -97,7 +122,7 @@ function initCard() {
         y: 0,
         rotation: -2,
         duration: 0.8,
-        ease: "power2.out"
+        ease: "power2.out",
       }, 0)
       .to(resultRef.value, { x: 0, opacity: 1, duration: 0.8, ease: "power2.out" }, 0);
 
@@ -110,12 +135,18 @@ function initCard() {
 }
 </script>
 
-
 <template>
-  <div class="page-container">
+  <!-- LOADING SCREEN -->
+  <div v-if="loading" class="loading-screen">
+    <h1 class="title dm-serif-text-regular-italic">Gazing at the stars...</h1>
+    <img src="../assets/logo.png" alt="Logo" class="logo" />
+  </div>
+
+  <!-- RESULT PAGE -->
+  <div v-else class="page-container">
     <div class="cardCont" ref="cardRef">
       <div class="cardBack" :style="{ backgroundImage: `url(${character?.image})` }"></div>
-      <div class="cardFront" style="background-image: url('images/card-back.png')">
+      <div class="cardFront" style="background-image: url('/images/card-back.png')">
         <div class="click-text dm-serif-text-regular-italic">Click to Reveal</div>
       </div>
     </div>
@@ -124,12 +155,31 @@ function initCard() {
       <h3 class="subtitle dm-sans-regular">You are:</h3>
       <h1 class="character-name dm-serif-text-regular-italic">{{ character?.name }}</h1>
       <p class="character-description dm-sans-regular">{{ result }}</p>
-      <button @click="router.push('/')"class="dm-sans-regular">Restart Test</button>
+      <button @click="router.push('/')" class="dm-sans-regular">Restart Test</button>
     </div>
   </div>
 </template>
 
 <style scoped>
+/* --- Loading Screen --- */
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  background: #2a5bbd;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  z-index: 9999;
+}
+
+.logo {
+  width: 180px;
+  opacity: 1;
+  animation: flicker 1.6s infinite ease-in-out;
+}
+
+/* --- Existing Styles Below --- */
 .page-container {
   position: relative;
   width: 100%;
@@ -149,7 +199,6 @@ function initCard() {
   position: relative;
   cursor: pointer;
   margin-bottom: 2rem;
-
 }
 
 .cardFront, .cardBack {
@@ -164,8 +213,6 @@ function initCard() {
   align-items: flex-start;
   cursor: pointer;
   box-shadow: 8px 8px 0px rgba(0,0,0,0.4);
-
-
 }
 
 .cardBack {
@@ -191,18 +238,12 @@ function initCard() {
   min-width: 550px;
   box-shadow: 8px 8px 0px rgba(0,0,0,0.4);
   rotate: 4deg;
+}
 
-}
-.subtitle{
-  color: #6c6c6c;
-}
-.character-name{
-  font-size: 6rem;
-}
-.character-description {
-  font-size: 1.5rem;
-}
-/* Responsive: stack card above result */
+.subtitle { color: #6c6c6c; }
+.character-name { font-size: 6rem; }
+.character-description { font-size: 1.5rem; }
+
 @media (max-width: 768px) {
   .page-container {
     flex-direction: column;
@@ -216,15 +257,14 @@ function initCard() {
   }
 }
 
-.result-container h2 { margin:0; font-size:1.5rem; }
-.result-container p { margin:0; margin-top:0.5rem; line-height:1.4; }
 .result-container button {
-  margin-top:1rem;
-  background:#2a5bbd;
-  color:#fff;
-  border:none;
-  padding:0.8rem 1.5rem;
-  cursor:pointer;
+  margin-top: 1rem;
+  background: #2a5bbd;
+  color: #fff;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  cursor: pointer;
+  transition: 0.2s;
 }
 .result-container button:hover {
   transform: translateY(-2px) scale(1.05);
