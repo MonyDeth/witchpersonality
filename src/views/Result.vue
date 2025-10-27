@@ -13,9 +13,9 @@ const result = ref("");
 const revealed = ref(false);
 
 const personalities = {
-  1: { name: "Marie", description: "Thoughtful and introspective.", image: "/src/assets/1-marie.png" },
-  2: { name: "Lyda", description: "Outgoing and adventurous.", image: "/src/assets/2-lyda.png" },
-  3: { name: "Vanna", description: "Creative and curious.", image: "/src/assets/3-vanna.png" },
+  1: { name: "Marie", description: "Thoughtful and introspective.", image: "/public/images/1-marie.png" },
+  2: { name: "Lyda", description: "Outgoing and adventurous.", image: "/public/images/2-lyda.png" },
+  3: { name: "Vanna", description: "Creative and curious.", image: "/public/images/3-vanna.png" },
 };
 
 onMounted(() => {
@@ -60,13 +60,13 @@ function animateCardEntry() {
     scale: 0.8,
     rotation: -5,
     duration: .8,
-    ease: "steps(6)"
+    ease: "power2.out"
   });
 
   gsap.to(card, {
     y: "-=15",
     duration: 2,
-    ease: "steps(6)",
+    ease: "easeOut",
     yoyo: true,
     repeat: -1,
     delay: 1.2
@@ -74,10 +74,9 @@ function animateCardEntry() {
   gsap.to(result, {
     y: "-=15",
     duration: 1.5,
-    ease: "steps(5)",
+    ease: "easeOut",
     yoyo: true,
     repeat: -1,
-    delay: 1.2
   });
 }
 
@@ -98,7 +97,7 @@ function initCard() {
         y: 0,
         rotation: -2,
         duration: 0.8,
-        ease: "power2.inOut"
+        ease: "power2.out"
       }, 0)
       .to(resultRef.value, { x: 0, opacity: 1, duration: 0.8, ease: "power2.out" }, 0);
 

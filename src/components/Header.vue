@@ -15,7 +15,7 @@
 <style scoped>
 .header {
   width: 100%;
-  padding: 1rem 2rem;
+  padding: .5rem 1rem;
   box-sizing: border-box;
 }
 
@@ -39,5 +39,17 @@
 .logo {
   width: 125px; /* adjust as needed */
   height: auto;
+}
+
+@media screen and (max-width: 768px) {
+  .header{
+    padding: .3rem 1rem;
+  }
+  .logo{
+    width: 100px;
+  }
+  .nav-link{
+    font-size: 1rem;
+  }
 }
 </style>

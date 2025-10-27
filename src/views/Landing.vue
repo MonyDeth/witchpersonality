@@ -18,7 +18,7 @@ onMounted(() => {
     scale: 0.8,
     rotation: -5,
     duration: 1,
-    ease: "steps(4)"
+    ease: "ease-out"
   });
 
   // Animate title after paper mostly finishes
@@ -36,7 +36,7 @@ onMounted(() => {
     y: 500,
     opacity: 0,
     duration: 1.5,
-    ease: "steps(8)"
+    ease: "ease-out"
   },"-=2" );
 });
 

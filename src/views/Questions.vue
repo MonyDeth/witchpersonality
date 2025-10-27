@@ -31,7 +31,7 @@ function nextQuestion() {
     y: -30,
     opacity: 0,
     duration: 0.4,
-    ease: "steps(4)",
+    ease: "ease-out",
     onComplete: () => {
       if (isLastQuestion) {
         router.push({
@@ -53,7 +53,7 @@ function animateAnswersIn() {
   gsap.fromTo(
       answersContainerRef.value,
       { y:80, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.6, ease: "steps(4)" }
+      { y: 0, opacity: 1, duration: 0.6, ease: "ease-out" }
   );
 }
 
