@@ -205,6 +205,10 @@ onMounted(() => {
   .question-text {
     font-size: 1.2rem;
   }
+  .answer-button {
+    font-size: .8rem;
+    padding: .7rem 1rem;
+  }
 
 }
 </style>
