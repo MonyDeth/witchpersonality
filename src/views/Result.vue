@@ -13,9 +13,9 @@ const result = ref("");
 const revealed = ref(false);
 
 const personalities = {
-  1: { name: "Marie", description: "Thoughtful and introspective.", image: "/public/images/1-marie.png" },
-  2: { name: "Lyda", description: "Outgoing and adventurous.", image: "/public/images/2-lyda.png" },
-  3: { name: "Vanna", description: "Creative and curious.", image: "/public/images/3-vanna.png" },
+  1: { name: "Marie", description: "Thoughtful and introspective.", image: "/images/1-marie.png" },
+  2: { name: "Lyda", description: "Outgoing and adventurous.", image: "/images/2-lyda.png" },
+  3: { name: "Vanna", description: "Creative and curious.", image: "/images/3-vanna.png" },
 };
 
 onMounted(() => {
