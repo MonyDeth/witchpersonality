@@ -67,7 +67,7 @@ onMounted(() => {
 <template>
   <div class="page-container" >
     <div class="question-box rotate-2">
-      <h2 class="question-text dm-serif-text-regular">{{ currentQuestion.text }}</h2>
+      <h2 class="question-text pop">{{ currentQuestion.text }}</h2>
 
       <div class="progress-bar-container">
         <div class="progress-bar" :style="{ width: progress + '%' }"></div>
@@ -82,14 +82,14 @@ onMounted(() => {
             :key="index"
             @click="selectAnswer(answer.personality)"
             :class="{ selected: selectedAnswer === answer.personality }"
-            class="answer-button dm-sans-bold"
+            class="answer-button lexend"
         >
           {{ answer.text }}
         </button>
       </div>
 
       <button
-          class="next-button"
+          class="next-button lexend"
           :disabled="!selectedAnswer"
           @click="nextQuestion"
       >
@@ -133,7 +133,7 @@ onMounted(() => {
   font-weight: 600;
   margin-bottom: 2rem;
   text-align: center;
-  color: #333;
+  color: #676767;
 }
 
 .progress-bar-container {
@@ -172,11 +172,14 @@ onMounted(() => {
 .answer-button.selected {
   background-color: #2a5bbd;
   color: #fff;
+  scale: 1.05;
+  rotate: 2deg;
 }
 
 .answer-button:hover {
   transform: translateY(-3px) scale(1.03);
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+
 }
 
 .next-button {

@@ -1,6 +1,14 @@
 /* Import base styles */
 @import './base.css';
 
+@font-face {
+    font-family: 'PopRumKiwi-Tel';
+    src: url('./fonts/PopRumKiwi-Tel.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
 
 /* Ensure full height and reset default margin/padding */
 html, body, #app {
@@ -42,6 +50,21 @@ html, body, #app {
     font-optical-sizing: auto;
     font-weight: 700;
     font-style: normal;
+}
+.lexend {
+    font-family: "Lexend Deca", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
+.lexend-bold {
+    font-family: "Lexend Deca", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style: normal;
+}
+.pop {
+    font-family: 'PopRumKiwi-Tel', sans-serif; /* Added a fallback */
 }
 
 .rotate-2{

@@ -7,7 +7,7 @@
       <router-link to="/">
         <img src="../assets/logo.png" alt="Logo" class="logo" />
       </router-link>
-      <router-link to="/about" class="nav-link dm-serif-text-regular-italic">About</router-link>
+      <router-link to="/about" class="nav-link pop">About</router-link>
     </nav>
   </header>
 </template>
@@ -15,7 +15,7 @@
 <style scoped>
 .header {
   width: 100%;
-  padding: .5rem 1rem;
+  padding: 0 6rem;
   box-sizing: border-box;
 }
 

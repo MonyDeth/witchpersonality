@@ -5,6 +5,7 @@ import About  from "@/views/About.vue";
 </script>
 
 <template>
+
   <div id="app">
     <Header />
     <router-view />

@@ -32,10 +32,15 @@ function preloadImage(src) {
 
 onMounted(async () => {
   const answersQuery = route.query.answers;
+
   if (!answersQuery) {
     result.value = "No results available.";
+    loading.value = false;
     return;
   }
+
+  // Start the loading animation immediately
+  flickerLogo();
 
   const answers = answersQuery.split(",");
   const counts = {};
@@ -50,17 +55,20 @@ onMounted(async () => {
     }
   }
 
-  character.value = personalities[maxKey];
+  character.value = personalities[maxKey] || personalities[1];
   result.value = character.value.description;
 
-  // Preload character image before showing page
+  // Preload the specific character image
   await preloadImage(character.value.image);
 
-  // Animate flicker while loading
-  flickerLogo();
-
-  // Simulate load delay for smooth transition
+  // Smooth transition to results
   setTimeout(async () => {
+    // 2. OPTIMIZATION: Kill the background animation before hiding the loader
+    if (loaderTimeline) {
+      loaderTimeline.kill();
+      loaderTimeline = null;
+    }
+
     loading.value = false;
     await nextTick();
     animateCardEntry();
@@ -68,42 +76,38 @@ onMounted(async () => {
   }, 2500);
 });
 
+let loaderTimeline;
+
 function flickerLogo() {
-  const tl = gsap.timeline({ repeat: -1, yoyo: true });
-  tl.to(".logo-loader", { opacity: 0.3, duration: 0.8, ease: "power1.inOut" })
+  loaderTimeline = gsap.timeline({ repeat: -1, yoyo: true });
+  loaderTimeline.to(".logo-loader", { opacity: 0.3, duration: 0.8, ease: "power1.inOut" })
       .to(".logo-loader", { opacity: 1, duration: 0.8, ease: "power1.inOut" });
 }
 
 function animateCardEntry() {
   const card = cardRef.value;
-  const result = resultRef.value;
 
-  const tl = gsap.timeline();
+  const tl = gsap.timeline({
+    defaults: { force3D: true }
+  });
 
   tl.from(card, {
-    y: 400,
+    y: 100,
     opacity: 0,
-    scale: 0.8,
-    rotation: -5,
-    duration: 0.8,
-    ease: "power2.out",
+    scale: 0.9,
+    rotation: -3,
+    duration: 1.2, // Slightly longer for a more "premium" feel
+    ease: "power3.out", // Smoother than power2
   });
 
-  gsap.to(card, {
-    y: "-=15",
-    duration: 2,
-    ease: "easeOut",
+  tl.to(card, {
+    y: "-=20",
+    duration: 3,
+    ease: "sine.inOut", // This is the secret to smooth floating
     yoyo: true,
     repeat: -1,
-    delay: 1.2,
-  });
-  gsap.to(result, {
-    y: "-=15",
-    duration: 1.5,
-    ease: "easeOut",
-    yoyo: true,
-    repeat: -1,
-  });
+  }, "-=0.2");
+
 }
 
 function initCard() {
@@ -140,7 +144,7 @@ function initCard() {
   <!-- LOADING SCREEN -->
   <div v-if="loading" class="loading-screen ">
     <img src="../assets/logo-loader.png" alt="Logo" class="logo-loader" />
-    <h3 class="title dm-serif-text-regular-italic">Gazing at the stars...</h3>
+    <h3 class="title lexend">Gazing at the stars...</h3>
   </div>
 
   <!-- RESULT PAGE -->
@@ -148,15 +152,19 @@ function initCard() {
     <div class="cardCont" ref="cardRef">
       <div class="cardBack" :style="{ backgroundImage: `url(${character?.image})` }"></div>
       <div class="cardFront" style="background-image: url('/images/card-back.png')">
-        <div class="click-text dm-serif-text-regular-italic">Click to Reveal</div>
+        <div class="click-text pop">Click to Reveal</div>
       </div>
     </div>
 
     <div class="result-container" ref="resultRef">
-      <h3 class="subtitle dm-sans-regular">You are:</h3>
-      <h1 class="character-name dm-serif-text-regular-italic">{{ character?.name }}</h1>
-      <p class="character-description dm-sans-regular">{{ result }}</p>
-      <button @click="router.push('/')" class="dm-sans-regular">Restart Test</button>
+      <h3 class="subtitle lexend">You are:</h3>
+      <div class="character-name-wrapper">
+        <h1 class="character-name-bg pop">{{ character?.name }}</h1>
+        <h1 class="character-name pop">{{ character?.name }}</h1>
+      </div>
+      <p class="character-description lexend">{{ result }}</p>
+      <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/playlist/61nGAiN77VagnmEQ6rvyNO?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+      <button @click="router.push('/')" class="lexend-bold">Restart Test</button>
     </div>
   </div>
 </template>
@@ -223,14 +231,14 @@ function initCard() {
 .click-text {
   margin: 1rem;
   color: #fff;
-  font-size: 1.3rem;
+  font-size: 1rem;
   text-align: center;
 }
 
 .result-container {
   position: absolute;
   right: 20%;
-  top: 50%;
+  top: 40%;
   transform: translateY(-50%) translateX(220px);
   background: #fff;
   padding: 2rem;
@@ -238,11 +246,44 @@ function initCard() {
   max-width: 750px;
   min-width: 550px;
   box-shadow: 8px 8px 0px rgba(0,0,0,0.4);
-  rotate: 4deg;
+}
+.character-name-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: flex-start; /* Aligns text to the left of the container */
+  align-items: center;
+  height: 6rem; /* Adjust based on your font size */
+  margin: 1rem 0;
+}
+
+.character-name, .character-name-bg {
+  position: absolute;
+  margin: 0;
+  font-size: 5rem; /* Large and impactful */
+  white-space: nowrap;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+/* The Top White Layer */
+.character-name {
+  color: white;
+  z-index: 10;
+  -webkit-text-stroke: 10px #2A5BBD;
+  paint-order: stroke fill;
+}
+
+/* The Bottom Blue Layer (The "3D" part) */
+.character-name-bg {
+  color: #2A5BBD;
+  z-index: 9;
+  /* Thick stroke to make the border look chunky */
+  -webkit-text-stroke: 10px #2A5BBD;
+  transform: translateY(6px);
+  paint-order: stroke fill;
 }
 
 .subtitle { color: #6c6c6c; }
-.character-name { font-size: 6rem; }
 .character-description { font-size: 1.5rem; }
 
 @media (max-width: 768px) {
@@ -275,8 +316,9 @@ function initCard() {
 
   .result-container {
     position: absolute;
-   left: 0;
-    top: 75%;
+    right: 5%;
+    top: 150%;
+
     transform: translateY(-50%) translateX(220px);
     background: #fff;
     padding: 2rem;
@@ -284,7 +326,13 @@ function initCard() {
     max-width: 750px;
     min-width: 250px;
     box-shadow: 8px 8px 0px rgba(0,0,0,0.4);
-    rotate: 4deg;
+    rotate: 1deg;
+  }
+  .character-name-wrapper {
+    height: 3rem;
+  }
+  .character-name, .character-name-bg {
+    font-size: 2.2rem;
   }
 
 }
