@@ -141,14 +141,12 @@ function initCard() {
 </script>
 
 <template>
-  <!-- LOADING SCREEN -->
-  <div v-if="loading" class="loading-screen ">
+  <div v-if="loading" class="loading-screen">
     <img src="../assets/logo-loader.png" alt="Logo" class="logo-loader" />
     <h3 class="title lexend">Gazing at the stars...</h3>
   </div>
 
-  <!-- RESULT PAGE -->
-  <div v-else class="page-container">
+  <div class="page-container" :class="{ 'is-hidden': loading }">
     <div class="cardCont" ref="cardRef">
       <div class="cardBack" :style="{ backgroundImage: `url(${character?.image})` }"></div>
       <div class="cardFront" style="background-image: url('/images/card-back.png')">
@@ -163,7 +161,9 @@ function initCard() {
         <h1 class="character-name pop">{{ character?.name }}</h1>
       </div>
       <p class="character-description lexend">{{ result }}</p>
+
       <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/playlist/61nGAiN77VagnmEQ6rvyNO?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+
       <button @click="router.push('/')" class="lexend-bold">Restart Test</button>
     </div>
   </div>
@@ -179,7 +179,7 @@ function initCard() {
   justify-content: center;
   flex-direction: column;
   align-items: center;
-  z-index: 9999;
+  z-index: 10000;
 }
 
 .logo-loader {
@@ -198,6 +198,12 @@ function initCard() {
   align-items: center;
   padding: 2rem;
   flex-wrap: wrap;
+}
+.page-container.is-hidden {
+  visibility: hidden;
+  height: 0;
+  overflow: hidden;
+  padding: 0;
 }
 
 .cardCont {

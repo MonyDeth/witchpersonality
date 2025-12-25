@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=DM+Serif+Text:ital@0;1&display=swap;&family=Lexend+Deca:wght@100..900&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
     <title>A Witch's Stop Personality Test</title>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -60,6 +61,11 @@
             from { left: -50%; }
             to { left: 150%; }
         }
+        @media (max-width: 768px) {
+            .loading-logo {
+                width: 100px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -79,10 +85,18 @@
 
 <script>
     window.addEventListener('load', function() {
+        const loader = document.getElementById('initial-loader');
+
+        if (localStorage.getItem('nompang_has_visited')) {
+            if(loader) loader.remove();
+            window.dispatchEvent(new Event('loaderFinished'));
+            return;
+        }
+
         const tl = gsap.timeline({
             onComplete: () => {
-                const loader = document.getElementById('initial-loader');
                 if(loader) loader.remove();
+                localStorage.setItem('nompang_has_visited', 'true');
                 window.dispatchEvent(new Event('loaderFinished'));
             }
         });

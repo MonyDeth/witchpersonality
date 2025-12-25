@@ -8,7 +8,11 @@ const foregroundRef = ref(null);
 const starBgRef = ref(null);
 
 onMounted(() => {
-  const tl = gsap.timeline({ delay: 3.5 });
+  const hasVisited = localStorage.getItem('nompang_has_visited');
+  const startDelay = hasVisited ? 0 : 3.5;
+
+  const tl = gsap.timeline({ delay: startDelay });
+
   // 1. Paper slides up
   tl.from(paperRef.value, {
     y: 200,
@@ -39,7 +43,7 @@ onMounted(() => {
 
 const handleMouseEnter = () => {
   gsap.to(starBgRef.value, {
-    scale: 1.3,
+    scale: 1.2,
     duration: 0.4,
     ease: "back.out(2)"
   });
@@ -190,7 +194,7 @@ const handleMouseLeave = () => {
 }
 
 .star-bg {
-  width: 100%;
+  width: 110%;
   height: auto;
 }
 

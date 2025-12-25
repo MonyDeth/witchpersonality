@@ -118,7 +118,7 @@ onMounted(() => {
 }
 
 .question-box {
-  background-color: #ffffff;
+  background-color: #F9F4DE;
   padding: 1rem 2rem;
   width: 100%;
   max-width: 750px;
@@ -139,7 +139,7 @@ onMounted(() => {
 .progress-bar-container {
   width: 100%;
   height: 10px;
-  background-color: #e0e0e0;
+  background-color: #EAE5C7;
   margin-bottom: 2rem;
   overflow: hidden;
 }
@@ -161,7 +161,7 @@ onMounted(() => {
 .answer-button {
   padding: 1rem 1.5rem;
   font-size: 1.1rem;
-  background-color: #f5f5f5;
+  background-color: #EAE5C7;
   color: #2a5bbd;
   border: 1px solid #e3e3e3;
   cursor: pointer;
