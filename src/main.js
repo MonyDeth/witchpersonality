@@ -6,12 +6,14 @@ import Landing from '@/views/Landing.vue'
 import About from '@/views/About.vue'
 import Questions from "@/views/Questions.vue";
 import Result from "@/views/Result.vue";
+import NotFound from "@/views/NotFound.vue";
 
 const routes = [
     { path: '/', name: 'Landing', component: Landing },
     { path: '/about', name: 'About', component: About },
     { path: '/questions', name: 'Questions', component: Questions },
     { path: "/result", name: "Result", component: Result },
+    { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFound }
 
 ]
 

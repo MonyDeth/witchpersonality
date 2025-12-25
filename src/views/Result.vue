@@ -17,7 +17,7 @@ const personalities = {
   1: { name: "Marie", description: "Thoughtful and introspective.", image: "/images/1-marie.png" },
   2: { name: "Lyda", description: "Outgoing and adventurous.", image: "/images/2-lyda.png" },
   3: { name: "Vanna", description: "Creative and curious.", image: "/images/3-vanna.png" },
-  4: { name: "Cat", description: "Meow Meow Meow... Meow!", image: "/images/4-cat.png" },
+  4: { name: "Mao", description: "Meow Meow Meow... Meow!", image: "/images/4-cat.png" },
 };
 
 // Helper to preload images

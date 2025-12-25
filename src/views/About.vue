@@ -18,7 +18,7 @@ const socials = [
   <div class="mobile-wrapper">
     <section class="about-card">
       <div class="logo-section">
-        <img src="../assets/Nompang-Studios-Full-White.webp" alt="Nompang Studios" class="studio-logo" />
+        <img src="../assets/nompang-blue.webp" alt="Nompang Studios" class="studio-logo" />
         <p class="info lexend">Nompang Studios is a small independent game studio based in Phnom Penh, made up of university students passionate about creating games. So far, we've baked (developed) 2 project and A Witch's Stop being our biggest yet.</p>
         <p class="info dm-sans-regular">Based in Phnom Penh, Cambodia</p>
       </div>
@@ -31,7 +31,7 @@ const socials = [
           <strong class="lexend-bold">A Witch’s Stop</strong> is an anime-inspired rhythm game where you play as members in a band full of teen witches. It consists of a gameplay fusion of music and magic where you cast spells along with the rhythm.
         </p>
         <p class="lexend">
-          Systems and mechanics will take heavy inspiration from rhythm games, like <strong class="lexend-bold">Unbeatable (D-CELL GAMES, 2025)</strong> <strong class="lexend-bold">and Muse Dash (peropero, 2019).</strong> The player will traverse through the cozy seaside village where there’s magic, witches, and high school.
+         The player will traverse through the cozy seaside village where there’s magic, witches, and high school.
         </p>
       </div>
 
@@ -50,10 +50,6 @@ const socials = [
           </a>
         </div>
       </div>
-
-
-      <img src="../assets/img_1.png" alt="Nompang Studios" class="game-logo" />
-
       <p class="footer-note lexend">© 2026 Nompang Studios</p>
     </section>
   </div>
@@ -67,6 +63,7 @@ const socials = [
   min-height: 100vh;
   background-color: #2A5BBD; /* Matching your main theme */
   padding: 2rem 1rem;
+
 }
 
 .about-card {
@@ -74,7 +71,6 @@ const socials = [
   max-width: 400px; /* This restricts it to mobile width */
   background: white;
   color: #2A5BBD;
-  border-radius: 8px;
   padding: 2rem;
   box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.2);
   text-align: center;
@@ -82,7 +78,6 @@ const socials = [
 
 .studio-logo {
   width: 120px;
-  filter: invert(1); /* If your logo is white, this makes it blue/dark for the white card */
   margin-bottom: 1rem;
 }
 .game-logo {
@@ -104,7 +99,6 @@ const socials = [
   margin: 2rem 0;
   opacity: 0.3;
 }
-
 .info-section h2 {
   font-size: 2rem;
   margin-bottom: 1rem;
@@ -140,7 +134,7 @@ const socials = [
 
 .social-section {
   display: flex;
-  justify-content: left;
+  justify-content: center;
   gap: 1.5rem;
   font-size: 1.5rem;
 }

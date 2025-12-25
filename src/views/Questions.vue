@@ -118,7 +118,7 @@ onMounted(() => {
 }
 
 .question-box {
-  background-color: #F9F4DE;
+  background-color: white;
   padding: 1rem 2rem;
   width: 100%;
   max-width: 750px;
@@ -133,13 +133,13 @@ onMounted(() => {
   font-weight: 600;
   margin-bottom: 2rem;
   text-align: center;
-  color: #676767;
+  color: #1a47a1;
 }
 
 .progress-bar-container {
   width: 100%;
   height: 10px;
-  background-color: #EAE5C7;
+  background-color: #dddddd;
   margin-bottom: 2rem;
   overflow: hidden;
 }
@@ -161,7 +161,7 @@ onMounted(() => {
 .answer-button {
   padding: 1rem 1.5rem;
   font-size: 1.1rem;
-  background-color: #EAE5C7;
+  background-color: white;
   color: #2a5bbd;
   border: 1px solid #e3e3e3;
   cursor: pointer;
@@ -170,8 +170,8 @@ onMounted(() => {
 }
 
 .answer-button.selected {
-  background-color: #2a5bbd;
-  color: #fff;
+  background-color: #FDC648;
+  color: #2a5bbd;
   scale: 1.05;
   rotate: 2deg;
 }
