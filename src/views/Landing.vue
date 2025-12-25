@@ -8,8 +8,7 @@ const foregroundRef = ref(null);
 const starBgRef = ref(null);
 
 onMounted(() => {
-  const tl = gsap.timeline();
-
+  const tl = gsap.timeline({ delay: 3.5 });
   // 1. Paper slides up
   tl.from(paperRef.value, {
     y: 200,
