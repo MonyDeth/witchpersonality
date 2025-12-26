@@ -209,7 +209,7 @@ onMounted(() => {
     font-size: 1.2rem;
   }
   .answer-button {
-    font-size: .8rem;
+    font-size: 1rem;
     padding: .7rem 1rem;
   }
 

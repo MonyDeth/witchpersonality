@@ -6,48 +6,56 @@ import gsap from "gsap";
 const router = useRouter();
 const route = useRoute();
 
-const loading = ref(true);        // NEW: loading screen visibility
+const loading = ref(true);
 const cardRef = ref(null);
 const resultRef = ref(null);
 const character = ref(null);
-const result = ref("");
 const revealed = ref(false);
 
 const personalities = {
-  1: { name: "Marie", description: "Thoughtful and introspective.", image: "/images/1-marie.png" },
-  2: { name: "Lyda", description: "Outgoing and adventurous.", image: "/images/2-lyda.png" },
-  3: { name: "Vanna", description: "Creative and curious.", image: "/images/3-vanna.png" },
-  4: { name: "Mao", description: "Meow Meow Meow... Meow!", image: "/images/4-cat.png" },
+  1: {
+    name: "Marie",
+    description: "The Heart of the Band.",
+    bio: "Marie is a focused university student by day and a lead guitarist by night. She often spends her time in the library researching ancient music theory.",
+    color: "Midnight Blue", likes: "Old Vinyl, Rain, Espresso", dislikes: "Direct Sunlight, Loud Crowds",
+    image: "/images/1-marie.png", spotify: "https://open.spotify.com/embed/playlist/37i9dQZF1EId68rU70H7S8"
+  },
+  2: {
+    name: "Lyda",
+    description: "The Spark of Energy.",
+    bio: "Always seen with a camera or a drumstick, Lyda lives for the moment. She's the one who convinced the group that magic and rhythm belong together.",
+    color: "Sunset Orange", likes: "Photography, Spicy Food, Arcades", dislikes: "Boring Lectures, Silence",
+    image: "/images/2-lyda.png", spotify: "https://open.spotify.com/embed/playlist/37i9dQZF1EIdf9KPrv2H7H"
+  },
+  3: {
+    name: "Vanna",
+    description: "The Ethereal Dreamer.",
+    bio: "Vanna is a quiet soul who communicates best through her bass lines. She believes that every seaside breeze carries a hidden melody.",
+    color: "Seafoam Green", likes: "Shell Collecting, Poetry, Herbal Tea", dislikes: "Rudeness, Technology Glitches",
+    image: "/images/3-vanna.png", spotify: "https://open.spotify.com/embed/playlist/37i9dQZF1EIe0vC0X7f4X4"
+  },
+  4: {
+    name: "Mao",
+    description: "The Chaos Element.",
+    bio: "Is he a cat? Is he a spirit? No one knows. He just showed up one day at the studio and started playing the synth with his paws.",
+    color: "Pure Black", likes: "Tuna, Keyboard Warmth, Naps", dislikes: "Water, Vacuum Cleaners",
+    image: "/images/4-cat.png", spotify: "https://open.spotify.com/embed/playlist/37i9dQZF1EId8G2o6q6p6O"
+  },
 };
-
-// Helper to preload images
-function preloadImage(src) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.src = src;
-    img.onload = resolve;
-    img.onerror = resolve;
-  });
-}
 
 onMounted(async () => {
   const answersQuery = route.query.answers;
-
   if (!answersQuery) {
-    result.value = "No results available.";
     loading.value = false;
     return;
   }
-
-  // Start the loading animation immediately
-  flickerLogo();
 
   const answers = answersQuery.split(",");
   const counts = {};
   answers.forEach(p => counts[p] = (counts[p] || 0) + 1);
 
   let max = -Infinity;
-  let maxKey = null;
+  let maxKey = 1;
   for (const key in counts) {
     if (counts[key] > max) {
       max = counts[key];
@@ -56,86 +64,75 @@ onMounted(async () => {
   }
 
   character.value = personalities[maxKey] || personalities[1];
-  result.value = character.value.description;
 
-  // Preload the specific character image
-  await preloadImage(character.value.image);
-
-  // Smooth transition to results
   setTimeout(async () => {
-    // 2. OPTIMIZATION: Kill the background animation before hiding the loader
-    if (loaderTimeline) {
-      loaderTimeline.kill();
-      loaderTimeline = null;
-    }
-
     loading.value = false;
     await nextTick();
     animateCardEntry();
-    initCard();
   }, 2500);
 });
 
-let loaderTimeline;
-
-function flickerLogo() {
-  loaderTimeline = gsap.timeline({ repeat: -1, yoyo: true });
-  loaderTimeline.to(".logo-loader", { opacity: 0.3, duration: 0.8, ease: "power1.inOut" })
-      .to(".logo-loader", { opacity: 1, duration: 0.8, ease: "power1.inOut" });
-}
-
+// --- ANIMATIONS ---
 function animateCardEntry() {
-  const card = cardRef.value;
+  const tl = gsap.timeline();
 
-  const tl = gsap.timeline({
-    defaults: { force3D: true }
-  });
-
-  tl.from(card, {
+  tl.from(cardRef.value, {
     y: 100,
     opacity: 0,
     scale: 0.9,
-    rotation: -3,
-    duration: 1.2, // Slightly longer for a more "premium" feel
-    ease: "power3.out", // Smoother than power2
+    rotation: -5,
+    duration: 1.2,
+    ease: "power3.out"
   });
 
-  tl.to(card, {
-    y: "-=20",
-    duration: 3,
-    ease: "sine.inOut", // This is the secret to smooth floating
+  // Floating Loop
+  tl.to(cardRef.value, {
+    y: "-=15",
+    duration: 2.5,
+    ease: "sine.inOut",
     yoyo: true,
-    repeat: -1,
-  }, "-=0.2");
-
+    repeat: -1
+  });
 }
 
-function initCard() {
-  const card = cardRef.value;
-  const front = card.querySelector(".cardFront");
-  const back = card.querySelector(".cardBack");
+function revealResult() {
+  if (revealed.value) return;
 
-  gsap.set(card, { transformStyle: "preserve-3d", transformPerspective: 1000, x: 0, y: 0 });
-  gsap.set(back, { rotationY: -180 });
-  gsap.set(resultRef.value, { opacity: 0, x: 50 });
 
-  const tl = gsap.timeline({ paused: true });
-  tl.to(front, { rotationY: 180, duration: 1 })
-      .to(back, { rotationY: 0, duration: 1 }, 0)
-      .to(card, {
-        x: window.innerWidth > 768 ? -220 : 0,
-        y: 0,
-        rotation: -2,
-        duration: 0.8,
-        ease: "power2.out",
-      }, 0)
-      .to(resultRef.value, { x: 0, opacity: 1, duration: 0.8, ease: "power2.out" }, 0);
+  // gsap.killTweensOf(cardRef.value);
 
-  card.addEventListener("click", () => {
-    if (!revealed.value) {
-      revealed.value = true;
-      tl.play();
-    }
+  const tl = gsap.timeline();
+
+  // 1. Flip the main card
+  tl.to(cardRef.value, {
+    rotationY: 180,
+    y: 0,
+    rotation: 0,
+    duration: 0.8,
+    ease: "power2.inOut"
+  });
+
+  // 2. Set initial state for result sections
+  revealed.value = true;
+
+  // 3. Staggered slide-in for the detail boxes
+  nextTick(() => {
+    gsap.from(".reveal-section", {
+      y: 100,
+      opacity: 0,
+      rotation: 2,
+      stagger: 0.2,
+      duration: 0.8,
+      ease: "back.out(1.2)",
+      clearProps: "all" // Cleans up transforms after animation
+    });
+
+    gsap.from(".restart-btn", {
+      opacity: 0,
+      scale: 0.8,
+      delay: 1,
+      duration: 0.5
+    });
   });
 }
 </script>
@@ -143,34 +140,90 @@ function initCard() {
 <template>
   <div v-if="loading" class="loading-screen">
     <img src="../assets/logo-loader.png" alt="Logo" class="logo-loader" />
-    <h3 class="title lexend">Gazing at the stars...</h3>
+    <h3 class="pop">Gazing at the stars...</h3>
   </div>
 
-  <div class="page-container" :class="{ 'is-hidden': loading }">
-    <div class="cardCont" ref="cardRef">
-      <div class="cardBack" :style="{ backgroundImage: `url(${character?.image})` }"></div>
-      <div class="cardFront" style="background-image: url('/images/card-back.png')">
-        <div class="click-text pop">Click to Reveal</div>
+  <div class="viewport-wrapper" v-else>
+    <section class="landing-mobile-screen scrollable">
+
+      <div class="card-area">
+        <div class="cardCont" ref="cardRef" @click="revealResult">
+          <div class="cardBack" :style="{ backgroundImage: `url(${character?.image})` }"></div>
+          <div class="cardFront" style="background-image: url('/images/card-back.png')">
+            <div class="click-text pop">Tap to Reveal</div>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <div class="result-container" ref="resultRef">
-      <h3 class="subtitle lexend">You are:</h3>
-      <div class="character-name-wrapper">
-        <h1 class="character-name-bg pop">{{ character?.name }}</h1>
-        <h1 class="character-name pop">{{ character?.name }}</h1>
+      <div v-if="revealed" class="results-content">
+
+        <div class="reveal-section result-card">
+          <h3 class="subtitle lexend">You are:</h3>
+          <div class="character-name-wrapper">
+            <h1 class="character-name-bg pop">{{ character?.name }}</h1>
+            <h1 class="character-name pop">{{ character?.name }}</h1>
+          </div>
+          <p class="character-description lexend">{{ character?.description }}</p>
+        </div>
+
+        <div class="reveal-section info-card">
+          <h4 class="pop section-title">About Her</h4>
+          <p class="lexend bio-text">{{ character?.bio }}</p>
+          <div class="stats-list lexend">
+            <p><strong class="lexend-bold">Favorite Color:</strong> {{ character?.color }}</p>
+            <p><strong class="lexend-bold">Likes:</strong> {{ character?.likes }}</p>
+            <p><strong class="lexend-bold">Dislikes:</strong> {{ character?.dislikes }}</p>
+          </div>
+        </div>
+
+        <div class="reveal-section spotify-card">
+          <h4 class="pop section-title">Her Playlist</h4>
+          <iframe
+              style="border-radius:12px"
+              :src="character?.spotify"
+              width="100%"
+              height="352"
+              frameBorder="0"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy">
+          </iframe>
+        </div>
+        <button @click="router.push('/')" class="restart-btn pop">Restart Test</button>
+        <div class="footer-spacer"></div>
       </div>
-      <p class="character-description lexend">{{ result }}</p>
 
-      <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/playlist/61nGAiN77VagnmEQ6rvyNO?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-
-      <button @click="router.push('/')" class="lexend-bold">Restart Test</button>
-    </div>
+    </section>
   </div>
 </template>
 
 <style scoped>
-/* --- Loading Screen --- */
+.viewport-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  width: 100%;
+  background: #2A5BBD;
+  overflow: hidden;
+}
+
+.landing-mobile-screen {
+  position: relative;
+  width: 100%;
+  max-width: 450px;
+  height: 100%;
+  background: #2A5BBD;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+.scrollable::-webkit-scrollbar { width: 0px; }
+
+/* LOADING SCREEN */
 .loading-screen {
   position: fixed;
   inset: 0;
@@ -179,180 +232,114 @@ function initCard() {
   justify-content: center;
   flex-direction: column;
   align-items: center;
-  z-index: 10000;
+  z-index: 999;
+  color: white;
 }
+.logo-loader { width: 140px; margin-bottom: 1rem; }
 
-.logo-loader {
-  width: 180px;
-  opacity: 1;
-  animation: flicker 1.6s infinite ease-in-out;
-}
-
-/* --- Existing Styles Below --- */
-.page-container {
-  position: relative;
-  width: 100%;
-  background: #2a5bbd;
+/* CARD AREA */
+.card-area {
+  perspective: 1000px;
+  padding-top: 5vh;
+  margin-bottom: 2rem; /* Reduced so content is visible sooner */
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 2rem;
-  flex-wrap: wrap;
-}
-.page-container.is-hidden {
-  visibility: hidden;
-  height: 0;
-  overflow: hidden;
-  padding: 0;
+  width: 100%;
+  min-height: 440px;
 }
 
 .cardCont {
-  width: 400px;
-  max-width: 90%;
-  height: 600px;
-  max-height: 80vh;
+  width: 280px;
+  height: 420px;
   position: relative;
+  transform-style: preserve-3d;
   cursor: pointer;
-  margin-bottom: 2rem;
 }
 
 .cardFront, .cardBack {
   position: absolute;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background-size: cover;
   background-position: center;
   backface-visibility: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  cursor: pointer;
-  box-shadow: 8px 8px 0px rgba(0,0,0,0.4);
+  box-shadow: 10px 10px 0px rgba(0,0,0,0.3);
+  border: 4px solid white;
 }
 
-.cardBack {
-  transform: rotateY(-180deg);
-}
-
+.cardBack { transform: rotateY(-180deg); }
 .click-text {
-  margin: 1rem;
-  color: #fff;
-  font-size: 1rem;
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
   text-align: center;
+  color: white;
+  background: rgba(42, 91, 189, 0.9);
+  padding: 8px 0;
 }
 
-.result-container {
-  position: absolute;
-  right: 20%;
-  top: 40%;
-  transform: translateY(-50%) translateX(220px);
-  background: #fff;
-  padding: 2rem;
-  color: #2a5bbd;
-  max-width: 750px;
-  min-width: 550px;
-  box-shadow: 8px 8px 0px rgba(0,0,0,0.4);
+/* RESULT SECTIONS */
+.results-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Content starts slightly overlapped with card area for a tight look */
+  margin-top: -20px;
 }
+
+.result-card, spotify-card {
+  rotate: 1deg;
+}
+
+.info-card{
+  rotate: -1deg;
+}
+.reveal-section {
+  background: white;
+  width: 90%;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 6px 6px 0px rgba(0,0,0,0.2);
+  color: #2A5BBD;
+  /* Ensure transform doesn't clip during animation */
+  will-change: transform, opacity;
+  translate: 0 -100px;
+}
+
+/* TYPOGRAPHY */
 .character-name-wrapper {
   position: relative;
-  display: flex;
-  justify-content: flex-start; /* Aligns text to the left of the container */
-  align-items: center;
-  height: 6rem; /* Adjust based on your font size */
-  margin: 1rem 0;
+  height: 3.5rem;
+  margin: 0.5rem 0;
 }
-
 .character-name, .character-name-bg {
   position: absolute;
-  margin: 0;
-  font-size: 5rem; /* Large and impactful */
-  white-space: nowrap;
-  line-height: 1;
+  font-size: 2.8rem;
   text-transform: uppercase;
 }
+.character-name { color: white; z-index: 2; -webkit-text-stroke: 6px #2A5BBD; paint-order: stroke fill; }
+.character-name-bg { color: #2A5BBD; z-index: 1; transform: translateY(5px); -webkit-text-stroke: 6px #2A5BBD; }
 
-/* The Top White Layer */
-.character-name {
-  color: white;
-  z-index: 10;
-  -webkit-text-stroke: 10px #2A5BBD;
-  paint-order: stroke fill;
+.section-title {
+  font-size: 1.1rem;
+  border-bottom: 2px dashed #2A5BBD;
+  margin-bottom: 1rem;
+  display: inline-block;
 }
 
-/* The Bottom Blue Layer (The "3D" part) */
-.character-name-bg {
+.bio-text { font-size: 0.9rem; line-height: 1.6; }
+.stats-list p { font-size: 0.85rem; margin: 5px 0; }
+
+.restart-btn {
+  background: white;
   color: #2A5BBD;
-  z-index: 9;
-  /* Thick stroke to make the border look chunky */
-  -webkit-text-stroke: 10px #2A5BBD;
-  transform: translateY(6px);
-  paint-order: stroke fill;
-}
-
-.subtitle { color: #6c6c6c; }
-.character-description { font-size: 1.5rem; }
-
-@media (max-width: 768px) {
-  .page-container {
-    flex-direction: column;
-    align-items: center;
-  }
-  .result-container {
-    position: static;
-    transform: none;
-    margin-top: 2rem;
-    width: 90%;
-  }
-  .cardCont {
-    width: 200px;
-    max-width: 90%;
-    height: 300px;
-    max-height: 80vh;
-    position: relative;
-    cursor: pointer;
-    margin-bottom: 2rem;
-  }
-
-  .character-name {
-    font-size: 1.8rem;
-  }
-  .character-description {
-    font-size: 1rem;
-  }
-
-  .result-container {
-    position: absolute;
-    right: 5%;
-    top: 150%;
-
-    transform: translateY(-50%) translateX(220px);
-    background: #fff;
-    padding: 2rem;
-    color: #2a5bbd;
-    max-width: 750px;
-    min-width: 250px;
-    box-shadow: 8px 8px 0px rgba(0,0,0,0.4);
-    rotate: 1deg;
-  }
-  .character-name-wrapper {
-    height: 3rem;
-  }
-  .character-name, .character-name-bg {
-    font-size: 2.2rem;
-  }
-
-}
-
-.result-container button {
-  margin-top: 1rem;
-  background: #2a5bbd;
-  color: #fff;
   border: none;
-  padding: 0.8rem 1.5rem;
+  padding: 1rem 2rem;
+  margin: 2rem 0;
+  box-shadow: 4px 4px 0px rgba(0,0,0,0.3);
   cursor: pointer;
-  transition: 0.2s;
+  font-weight: bold;
 }
-.result-container button:hover {
-  transform: translateY(-2px) scale(1.05);
-}
+
+.footer-spacer { height: 10vh; }
 </style>
