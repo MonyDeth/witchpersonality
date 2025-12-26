@@ -8,36 +8,27 @@ const foregroundRef = ref(null);
 const starBgRef = ref(null);
 
 onMounted(() => {
-  const hasVisited = localStorage.getItem('nompang_has_visited');
-  const startDelay = hasVisited ? 0 : 3.5;
+  const startAnimations = () => {
+    const hasVisited = localStorage.getItem('nompang_has_visited');
+    // If visited, start immediately. If first time, wait for the loader to finish.
+    const startDelay = hasVisited ? 0 : 0.5;
 
-  const tl = gsap.timeline({
-    delay: startDelay,
-    defaults: { ease: "power2.out", force3D: true }
-  });
+    const tl = gsap.timeline({
+      delay: startDelay,
+      defaults: { ease: "power2.out", force3D: true }
+    });
 
-  tl.from(paperRef.value, {
-    y: 200,
-    opacity: 0,
-    scale: 0.8,
-    rotation: -5,
-    duration: 1
-  });
+    tl.from(paperRef.value, { y: 200, opacity: 0, scale: 0.8, rotation: -5, duration: 1 });
+    tl.from(titleRef.value, { y: 60, opacity: 0, scale: 0.9, duration: 1, ease: "back.out(1.7)" }, "-=0.6");
+    tl.from(foregroundRef.value, { y: 120, opacity: 0, duration: 1.2 }, "-=0.8");
+  };
 
-  tl.from(titleRef.value, {
-    y: 60,
-    opacity: 0,
-    scale: 0.9,
-    duration: 1,
-    ease: "back.out(1.7)"
-  }, "-=0.6");
-
-  // Clouds slide up from the floor
-  tl.from(foregroundRef.value, {
-    y: 120,
-    opacity: 0,
-    duration: 1.2
-  }, "-=0.8");
+  // Check if page is already loaded
+  if (document.readyState === 'complete') {
+    startAnimations();
+  } else {
+    window.addEventListener('load', startAnimations);
+  }
 });
 
 const handleMouseEnter = () => {

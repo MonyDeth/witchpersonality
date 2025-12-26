@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, nextTick } from "vue";
+import { ref, onMounted, onUnmounted, nextTick } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import gsap from "gsap";
 
@@ -8,48 +8,59 @@ const route = useRoute();
 
 const loading = ref(true);
 const cardRef = ref(null);
-const resultRef = ref(null);
+const loaderLogoRef = ref(null); // Ref for the spinning logo
 const character = ref(null);
 const revealed = ref(false);
+
+let spinTween = null; // Reference to the GSAP animation for cleanup
 
 const personalities = {
   1: {
     name: "Marie",
     description: "The Heart of the Band.",
-    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    color: "Emerald, Green", likes: "Green stuff idk", dislikes: "67",
-    image: "/images/1-marie.png", spotify: "https://open.spotify.com/embed/playlist/37i9dQZF1EIdf9KPrv2H7H"
+    bio: "The guiding light of the group, Marie brings harmony wherever she goes. Her gentle nature mask a fierce loyalty to her coven.",
+    color: "Emerald Green", likes: "Herbal Tea, Vintage Records", dislikes: "Disharmony, Cold Coffee",
+    image: "/images/1-marie.png", spotify: "https://open.spotify.com/embed/playlist/61nGAiN77VagnmEQ6rvyNO?utm_source=generator"
   },
   2: {
     name: "Lyda",
     description: "The Spark of Energy.",
-    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    color: "Red", likes: "Water", dislikes: "water shower",
-    image: "/images/2-lyda.png", spotify: "https://open.spotify.com/embed/playlist/37i9dQZF1EIdf9KPrv2H7H"
+    bio: "A whirlwind of charisma and fire. Lyda never backs down from a challenge and keeps the spirits of her friends high with her infectious laughter.",
+    color: "Crimson Red", likes: "Night Runs, Spicy Food", dislikes: "Standing Still, Rain Clouds",
+    image: "/images/2-lyda.png", spotify: "https://open.spotify.com/embed/playlist/61nGAiN77VagnmEQ6rvyNO?utm_source=generator"
   },
   3: {
     name: "Vanna",
     description: "The Ethereal Dreamer.",
-    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ",
-    color: "BLUE", likes: "cat", dislikes: "shower",
-    image: "/images/3-vanna.png", spotify: "https://open.spotify.com/embed/playlist/37i9dQZF1EIdf9KPrv2H7H"
+    bio: "Vanna walks between worlds. Calm and intuitive, she often sees what others miss and provides the quiet wisdom the team needs.",
+    color: "Celestial Blue", likes: "Star Gazing, Silk Scarves", dislikes: "Loud Noises, Bright Neon",
+    image: "/images/3-vanna.png", spotify: "https://open.spotify.com/embed/playlist/61nGAiN77VagnmEQ6rvyNO?utm_source=generator"
   },
   4: {
     name: "Mao",
     description: "The Chaos Element.",
-    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    color: "Void", likes: "Tuna, Keyboard Warmth, Naps, yo mama", dislikes: "Water, Vacuum Cleaners, and impending of doom of humanity consequences",
-    image: "/images/4-cat.png", spotify: "https://open.spotify.com/embed/playlist/37i9dQZF1EIdf9KPrv2H7H"
+    bio: "Unpredictable and brilliant. Mao thrives in the unknown, often finding the most creative solutions through a bit of playful trouble.",
+    color: "Midnight Violet", likes: "Shiny Trinkets, Ancient Spells", dislikes: "Rules, Early Mornings",
+    image: "/images/4-cat.png", spotify: "https://open.spotify.com/embed/playlist/61nGAiN77VagnmEQ6rvyNO?utm_source=generator"
   },
 };
 
 onMounted(async () => {
+  // Start the spin animation immediately
+  spinTween = gsap.to(loaderLogoRef.value, {
+    rotation: -920,
+    duration: 3,
+    repeat: -1,
+    ease: "expo.inOut"
+  });
+
   const answersQuery = route.query.answers;
   if (!answersQuery) {
-    loading.value = false;
+    stopLoading();
     return;
   }
 
+  // Calculate Result
   const answers = answersQuery.split(",");
   const counts = {};
   answers.forEach(p => counts[p] = (counts[p] || 0) + 1);
@@ -65,11 +76,28 @@ onMounted(async () => {
 
   character.value = personalities[maxKey] || personalities[1];
 
-  setTimeout(async () => {
-    loading.value = false;
-    await nextTick();
-    animateCardEntry();
+  // Simulated loading delay
+  setTimeout(() => {
+    stopLoading();
   }, 2500);
+});
+
+function stopLoading() {
+  // KILL the animation instance to save memory
+  if (spinTween) {
+    spinTween.kill();
+    spinTween = null;
+  }
+
+  loading.value = false;
+  nextTick(() => {
+    animateCardEntry();
+  });
+}
+
+onUnmounted(() => {
+  // Safety cleanup
+  if (spinTween) spinTween.kill();
 });
 
 // --- ANIMATIONS ---
@@ -85,7 +113,6 @@ function animateCardEntry() {
     ease: "power3.out"
   });
 
-  // Floating Loop
   tl.to(cardRef.value, {
     y: "-=15",
     duration: 2.5,
@@ -98,12 +125,8 @@ function animateCardEntry() {
 function revealResult() {
   if (revealed.value) return;
 
-
-  // gsap.killTweensOf(cardRef.value);
-
   const tl = gsap.timeline();
 
-  // 1. Flip the main card
   tl.to(cardRef.value, {
     rotationY: 180,
     y: 0,
@@ -112,10 +135,8 @@ function revealResult() {
     ease: "power2.inOut"
   });
 
-  // 2. Set initial state for result sections
   revealed.value = true;
 
-  // 3. Staggered slide-in for the detail boxes
   nextTick(() => {
     gsap.from(".reveal-section", {
       y: 100,
@@ -124,7 +145,7 @@ function revealResult() {
       stagger: 0.2,
       duration: 0.8,
       ease: "back.out(1.2)",
-      clearProps: "all" // Cleans up transforms after animation
+      clearProps: "all"
     });
 
     gsap.from(".restart-btn", {
@@ -139,7 +160,12 @@ function revealResult() {
 
 <template>
   <div v-if="loading" class="loading-screen">
-    <img src="../assets/logo-loader.png" alt="Logo" class="logo-loader" />
+    <img
+        src="../assets/loading.webp"
+        alt="Loading"
+        class="logo-loader"
+        ref="loaderLogoRef"
+    />
     <h3 class="pop">Gazing at the stars...</h3>
   </div>
 
@@ -156,7 +182,6 @@ function revealResult() {
       </div>
 
       <div v-if="revealed" class="results-content">
-
         <div class="reveal-section result-card">
           <h3 class="subtitle lexend">You are:</h3>
           <div class="character-name-wrapper">
@@ -167,7 +192,7 @@ function revealResult() {
         </div>
 
         <div class="reveal-section info-card">
-          <h4 class="pop section-title">About Her</h4>
+          <h4 class="pop section-title">Preferences</h4>
           <p class="lexend bio-text">{{ character?.bio }}</p>
           <div class="stats-list lexend">
             <p><strong class="lexend-bold">Favorite Color:</strong> {{ character?.color }}</p>
@@ -177,7 +202,7 @@ function revealResult() {
         </div>
 
         <div class="reveal-section spotify-card">
-          <h4 class="pop section-title">Her Playlist</h4>
+          <h4 class="pop section-title">Vibe the coven</h4>
           <iframe
               style="border-radius:12px"
               :src="character?.spotify"
@@ -188,6 +213,7 @@ function revealResult() {
               loading="lazy">
           </iframe>
         </div>
+
         <button @click="router.push('/')" class="restart-btn pop">Restart Test</button>
         <div class="footer-spacer"></div>
       </div>
@@ -235,13 +261,18 @@ function revealResult() {
   z-index: 999;
   color: white;
 }
-.logo-loader { width: 140px; margin-bottom: 1rem; }
+
+.logo-loader {
+  width: 120px;
+  margin-bottom: 1.5rem;
+  will-change: transform;
+}
 
 /* CARD AREA */
 .card-area {
   perspective: 1000px;
   padding-top: 5vh;
-  margin-bottom: 2rem; /* Reduced so content is visible sooner */
+  margin-bottom: 2rem;
   display: flex;
   justify-content: center;
   width: 100%;
@@ -266,6 +297,7 @@ function revealResult() {
 }
 
 .cardBack { transform: rotateY(-180deg); }
+
 .click-text {
   position: absolute;
   bottom: 20px;
@@ -282,17 +314,13 @@ function revealResult() {
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* Content starts slightly overlapped with card area for a tight look */
   margin-top: -20px;
 }
 
-.result-card, spotify-card {
-  rotate: 1deg;
-}
+.result-card { rotate: 1deg; }
+.info-card { rotate: -1deg; }
+.spotify-card { rotate: 1deg; }
 
-.info-card{
-  rotate: -1deg;
-}
 .reveal-section {
   background: white;
   width: 90%;
@@ -300,9 +328,7 @@ function revealResult() {
   margin-bottom: 1.5rem;
   box-shadow: 6px 6px 0px rgba(0,0,0,0.2);
   color: #2A5BBD;
-  /* Ensure transform doesn't clip during animation */
   will-change: transform, opacity;
-  translate: 0 -100px;
 }
 
 /* TYPOGRAPHY */

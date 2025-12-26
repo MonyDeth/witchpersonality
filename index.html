@@ -5,7 +5,7 @@
     <link rel="icon" href="/favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=DM+Serif+Text:ital@0;1&display=swap;&family=Lexend+Deca:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
     <title>A Witch's Stop Personality Test</title>
@@ -13,7 +13,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
     <style>
-        /* 2. Loader Styles */
         #initial-loader {
             position: fixed;
             inset: 0;
@@ -23,105 +22,149 @@
             align-items: center;
             z-index: 99999;
             overflow: hidden;
+            color: white;
+            font-family: 'Lexend Deca', sans-serif;
         }
 
         .loader-content {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 40px;
+            width: 250px;
         }
 
         .loading-logo {
             width: 200px;
             height: auto;
             opacity: 0;
-            will-change: filter, opacity, transform;
+            margin-bottom: 30px;
         }
-        /* Simple CSS bar as fallback while GSAP loads */
-        .loading-bar {
-            width: 150px;
-            height: 5px;
-            border-radius: 5px;
+
+        /* Actual Progress Container */
+        .progress-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 6px;
             background: rgba(255, 255, 255, 0.1);
-            margin-top: 20px;
+            border-radius: 10px;
             position: relative;
             overflow: hidden;
         }
-        .loading-bar::after {
-            content: '';
+
+        .progress-fill {
             position: absolute;
-            width: 40%;
+            left: 0;
+            top: 0;
             height: 100%;
-            background: white;
-            left: -50%;
-            animation: slide 1.5s infinite ease-in-out;
+            width: 0%; /* Controlled by JS */
+            background: #FFFFFF;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            transition: width 0.3s ease-out;
         }
-        @keyframes slide {
-            from { left: -50%; }
-            to { left: 150%; }
+
+        .progress-text, .loading-status {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
         }
+
+        .loading-status {
+            margin-top: 5px;
+            height: 1rem; /* Prevent layout jump when text changes */
+        }
+
         @media (max-width: 768px) {
-            .loading-logo {
-                width: 100px;
-            }
+            .loading-logo { width: 140px; }
+            .loader-content { width: 180px; }
         }
     </style>
 </head>
 <body>
 <div id="initial-loader">
     <div class="loader-content">
-        <img
-                id="loader-logo"
-                src="/src/assets/Nompang-Studios-Full-White.webp"
-                alt="Nompang Studios"
-                class="loading-logo"
-        >
-        <div class="loading-bar"></div>
+        <img id="loader-logo" src="/src/assets/Nompang-Studios-Full-White.webp" alt="Nompang Studios" class="loading-logo">
+
+        <div class="progress-container">
+            <div class="progress-bar-bg">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+            <div class="progress-text"><span id="perc">0</span>%</div>
+            <div id="status-text" class="loading-status">Mixing Ingredients...</div>
+        </div>
     </div>
 </div>
 
 <div id="app"></div>
 
 <script>
-    window.addEventListener('load', function() {
+    (function() {
+        const fill = document.getElementById('progress-fill');
+        const percText = document.getElementById('perc');
+        const statusText = document.getElementById('status-text');
         const loader = document.getElementById('initial-loader');
 
+        // Check if returning user
         if (localStorage.getItem('nompang_has_visited')) {
-            if(loader) loader.remove();
-            window.dispatchEvent(new Event('loaderFinished'));
+            loader.style.display = 'none';
             return;
         }
 
-        const tl = gsap.timeline({
-            onComplete: () => {
-                if(loader) loader.remove();
-                localStorage.setItem('nompang_has_visited', 'true');
-                window.dispatchEvent(new Event('loaderFinished'));
-            }
-        });
+        // 1. Initial Logo Fade In
+        gsap.to("#loader-logo", { opacity: 1, duration: 1, ease: "power2.out" });
 
-        // Magical Reveal (Instead of clipping)
-        tl.to("#loader-logo", {
-            opacity: 1,
-            duration: 0.8,
-            ease: "power2.out"
-        })
-            // The Glow: Now it will spread outside the logo without being cut
-            .to("#loader-logo", {
-                filter: "drop-shadow(0 0 20px rgba(255, 255, 255, 0.7))",
-                duration: 1.2,
-                ease: "sine.inOut"
+        // 2. Track Loading Progress
+        // We simulate the progress based on internal browser loading events
+        let progress = 0;
+        const interval = setInterval(() => {
+            // Incremental progress while waiting for 'window.load'
+            if (progress < 90) {
+                progress += Math.random() * 15;
+                if (progress > 90) progress = 90;
+                updateUI(Math.floor(progress));
+            }
+        }, 400);
+
+        function updateUI(val) {
+            fill.style.width = val + '%';
+            percText.innerText = val;
+        }
+
+        window.addEventListener('load', function() {
+            clearInterval(interval);
+            updateUI(100);
+            statusText.innerText = "Good to brew!";
+            statusText.style.color = "#FFFFFF"; // Minty green success color
+
+            // 3. Final Transition
+            const tl = gsap.timeline({
+                delay: 0.8, // Let them read "Good to brew!"
+                onComplete: () => {
+                    loader.remove();
+                    localStorage.setItem('nompang_has_visited', 'true');
+                    window.dispatchEvent(new Event('loaderFinished'));
+                }
             });
 
-        // The Exit (Your asymmetric fly-up)
-        tl.to("#initial-loader", {
-            yPercent: -120, // Move extra far to clear the 115vh height
-            duration: 1,
-            ease: "power4.in",
-            delay: 0.5
+            tl.to("#loader-logo", {
+                filter: "drop-shadow(0 0 25px rgba(255, 255, 255, 0.9))",
+                scale: 1.05,
+                duration: 0.6
+            })
+                .to("#initial-loader", {
+                    yPercent: -100,
+                    duration: 1.2,
+                    ease: "power4.inOut"
+                });
         });
-    });
+    })();
 </script>
 
 <script type="module" src="/src/main.js"></script>
