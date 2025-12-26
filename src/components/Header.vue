@@ -4,7 +4,7 @@ import { ref, onMounted, onUnmounted } from 'vue';
 // or being moved to 'public/' to work in production.
 import audioFile from '../assets/arcade menu acoustic take2.mp3';
 
-const isPlaying = ref(true);
+const isPlaying = ref(false);
 const audioRef = ref(null);
 
 const playMusic = () => {
