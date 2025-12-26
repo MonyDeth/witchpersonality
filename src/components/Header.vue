@@ -1,19 +1,20 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
-// NOTE: I kept your local path, but usually 'src/assets' requires an import
-// or being moved to 'public/' to work in production.
 import audioFile from '../assets/arcade menu acoustic take2.mp3';
 
 const isPlaying = ref(false);
 const audioRef = ref(null);
+// We track if the user *intended* for the music to be on
+const userWantsMusic = ref(false);
 
 const playMusic = () => {
   if (audioRef.value && !isPlaying.value) {
     audioRef.value.play()
         .then(() => {
           isPlaying.value = true;
+          userWantsMusic.value = true;
         })
-        .catch(err => {
+        .catch(() => {
           console.log("Autoplay blocked. Waiting for interaction.");
         });
   }
@@ -24,19 +25,46 @@ const toggleMusic = (event) => {
   if (isPlaying.value) {
     audioRef.value.pause();
     isPlaying.value = false;
+    userWantsMusic.value = false;
   } else {
     audioRef.value.play();
     isPlaying.value = true;
+    userWantsMusic.value = true;
+  }
+};
+
+// --- FIX: STOP MUSIC WHEN APP IS CLOSED/HIDDEN ---
+const handleVisibilityChange = () => {
+  if (!audioRef.value) return;
+
+  if (document.hidden) {
+    // Tab is hidden or phone is locked
+    audioRef.value.pause();
+    isPlaying.value = false;
+  } else {
+    // Tab is back in focus - only resume if the user hadn't manually muted it
+    if (userWantsMusic.value) {
+      audioRef.value.play();
+      isPlaying.value = true;
+    }
   }
 };
 
 onMounted(() => {
-  if (audioRef.value) { audioRef.value.volume = 0.4; }
+  if (audioRef.value) {
+    audioRef.value.volume = 0.4;
+  }
+
+  // Unlock audio on first click
   window.addEventListener('click', playMusic, { once: true });
+
+  // Listen for tab/app switching
+  document.addEventListener('visibilitychange', handleVisibilityChange);
 });
 
 onUnmounted(() => {
   window.removeEventListener('click', playMusic);
+  document.removeEventListener('visibilitychange', handleVisibilityChange);
 });
 </script>
 
@@ -50,7 +78,7 @@ onUnmounted(() => {
 
         <div class="nav-right">
           <div class="music-toggle" @click="toggleMusic">
-            <i :class="isPlaying ? 'ri-volume-up-line' : 'ri-volume-mute-line'" class="volume-icon"></i>
+            <i :class="isPlaying ? 'ri-volume-up-fill' : 'ri-volume-mute-fill'" class="volume-icon"></i>
 
             <div class="music-bars" :class="{ 'is-playing': isPlaying }">
               <span class="bar"></span>
@@ -58,7 +86,7 @@ onUnmounted(() => {
               <span class="bar"></span>
             </div>
 
-            <audio ref="audioRef" :src="audioFile" loop preload="auto" autoplay></audio>
+            <audio ref="audioRef" :src="audioFile" loop preload="auto"></audio>
           </div>
 
           <router-link to="/about" class="nav-link pop">About</router-link>
@@ -102,19 +130,24 @@ onUnmounted(() => {
 /* --- MUSIC PLAYER STYLES --- */
 .music-toggle {
   cursor: pointer;
-  height: 32px;
+  height: 36px;
   display: flex;
   align-items: center;
-  gap: 8px; /* Gap between icon and bars */
-  background: rgba(255, 255, 255, 0.1);
-  padding: 0 12px;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 0 14px;
   border-radius: 20px;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.music-toggle:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .volume-icon {
   color: white;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
 }
 
 .music-bars {
@@ -128,11 +161,11 @@ onUnmounted(() => {
 .bar {
   width: 3px;
   background-color: white;
-  height: 4px; /* Default static height */
-  transition: height 0.3s ease;
+  height: 3px; /* Static height when paused */
+  border-radius: 1px;
 }
 
-/* Only animate when the .is-playing class is present */
+/* Animation only plays when music is active */
 .is-playing .bar {
   animation: equalize 0.8s infinite ease-in-out;
 }
@@ -147,7 +180,7 @@ onUnmounted(() => {
 }
 
 @media screen and (max-width: 480px) {
-  .logo { width: 80px; }
-  .nav-link { font-size: 0.9rem; }
+  .logo { width: 85px; }
+  .nav-link { font-size: 0.95rem; }
 }
 </style>
