@@ -16,30 +16,30 @@ const personalities = {
   1: {
     name: "Marie",
     description: "The Heart of the Band.",
-    bio: "Marie is a focused university student by day and a lead guitarist by night. She often spends her time in the library researching ancient music theory.",
-    color: "Midnight Blue", likes: "Old Vinyl, Rain, Espresso", dislikes: "Direct Sunlight, Loud Crowds",
-    image: "/images/1-marie.png", spotify: "https://open.spotify.com/embed/playlist/37i9dQZF1EId68rU70H7S8"
+    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    color: "Emerald, Green", likes: "Green stuff idk", dislikes: "67",
+    image: "/images/1-marie.png", spotify: "https://open.spotify.com/embed/playlist/37i9dQZF1EIdf9KPrv2H7H"
   },
   2: {
     name: "Lyda",
     description: "The Spark of Energy.",
-    bio: "Always seen with a camera or a drumstick, Lyda lives for the moment. She's the one who convinced the group that magic and rhythm belong together.",
-    color: "Sunset Orange", likes: "Photography, Spicy Food, Arcades", dislikes: "Boring Lectures, Silence",
+    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    color: "Red", likes: "Water", dislikes: "water shower",
     image: "/images/2-lyda.png", spotify: "https://open.spotify.com/embed/playlist/37i9dQZF1EIdf9KPrv2H7H"
   },
   3: {
     name: "Vanna",
     description: "The Ethereal Dreamer.",
-    bio: "Vanna is a quiet soul who communicates best through her bass lines. She believes that every seaside breeze carries a hidden melody.",
-    color: "Seafoam Green", likes: "Shell Collecting, Poetry, Herbal Tea", dislikes: "Rudeness, Technology Glitches",
-    image: "/images/3-vanna.png", spotify: "https://open.spotify.com/embed/playlist/37i9dQZF1EIe0vC0X7f4X4"
+    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ",
+    color: "BLUE", likes: "cat", dislikes: "shower",
+    image: "/images/3-vanna.png", spotify: "https://open.spotify.com/embed/playlist/37i9dQZF1EIdf9KPrv2H7H"
   },
   4: {
     name: "Mao",
     description: "The Chaos Element.",
-    bio: "Is he a cat? Is he a spirit? No one knows. He just showed up one day at the studio and started playing the synth with his paws.",
-    color: "Pure Black", likes: "Tuna, Keyboard Warmth, Naps", dislikes: "Water, Vacuum Cleaners",
-    image: "/images/4-cat.png", spotify: "https://open.spotify.com/embed/playlist/37i9dQZF1EId8G2o6q6p6O"
+    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    color: "Void", likes: "Tuna, Keyboard Warmth, Naps, yo mama", dislikes: "Water, Vacuum Cleaners, and impending of doom of humanity consequences",
+    image: "/images/4-cat.png", spotify: "https://open.spotify.com/embed/playlist/37i9dQZF1EIdf9KPrv2H7H"
   },
 };
 
@@ -263,7 +263,6 @@ function revealResult() {
   background-position: center;
   backface-visibility: hidden;
   box-shadow: 10px 10px 0px rgba(0,0,0,0.3);
-  border: 4px solid white;
 }
 
 .cardBack { transform: rotateY(-180deg); }
