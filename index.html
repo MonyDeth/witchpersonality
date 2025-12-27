@@ -63,24 +63,29 @@
             left: 0;
             top: 0;
             height: 100%;
-            width: 0%; /* Controlled by JS */
+            width: 0; /* Controlled by JS */
             background: #FFFFFF;
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
             transition: width 0.3s ease-out;
         }
 
-        .progress-text, .loading-status {
+        .progress-text {
             font-size: 0.8rem;
-            text-transform: uppercase;
             letter-spacing: 2px;
             font-weight: 600;
+            text-align: center; /* Explicitly center the percentage */
+            width: 100%;
         }
 
         .loading-status {
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            font-weight: 600;
             margin-top: 5px;
-            height: 1rem; /* Prevent layout jump when text changes */
+            height: 1.2rem;
+            text-align: center; /* Explicitly center the status text */
+            width: 100%;
         }
-
         @media (max-width: 768px) {
             .loading-logo { width: 140px; }
             .loader-content { width: 180px; }
@@ -97,7 +102,7 @@
                 <div id="progress-fill" class="progress-fill"></div>
             </div>
             <div class="progress-text"><span id="perc">0</span>%</div>
-            <div id="status-text" class="loading-status">Mixing Ingredients...</div>
+            <div id="status-text" class="loading-status">Loading...</div>
         </div>
     </div>
 </div>

@@ -191,7 +191,7 @@ onUnmounted(() => {
 
 .music-hint-pill {
   position: fixed;
-  bottom: 24px;
+  bottom: 50px;
   background: white;
   color: #2A5BBD;
   padding: 10px 18px;
