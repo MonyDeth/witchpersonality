@@ -89,7 +89,7 @@ onMounted(() => {
       </div>
 
       <button
-          class="next-button lexend"
+          class="next-button pop"
           :disabled="!selectedAnswer"
           @click="nextQuestion"
       >

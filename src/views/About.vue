@@ -5,6 +5,12 @@ const team = [
   { name: "Name Three", title: "Writer" }
 ];
 
+const credit = [
+  { name: "Rachel", title: "Writer" },
+  { name: "Jet", title: "Writer" },
+  { name: "Akari", title: "Design and Development" }
+];
+
 const socials = [
   { name: "Facebook", icon: "ri-facebook-circle-fill", url: "#" },
   { name: "Instagram", icon: "ri-instagram-fill", url: "#" },
@@ -20,7 +26,7 @@ const socials = [
       <div class="logo-section">
         <img src="../assets/nompang-blue.webp" alt="Nompang Studios" class="studio-logo" />
         <p class="info lexend">Nompang Studios is a small independent game studio based in Phnom Penh, made up of university students passionate about creating games. So far, we've baked (developed) 2 project and A Witch's Stop being our biggest yet.</p>
-        <p class="info dm-sans-regular">Based in Phnom Penh, Cambodia</p>
+        <p class="info lexend-bold">Based in Phnom Penh, Cambodia</p>
       </div>
 
       <hr class="divider" />
@@ -38,10 +44,19 @@ const socials = [
       <div class="team-section">
         <h3 class="pop">Team</h3>
         <div v-for="member in team" :key="member.name" class="team-member">
-          <span class="member-name dm-sans-bold">{{ member.name }}</span>
+          <span class="member-name lexend-bold">{{ member.name }}</span>
           <span class="member-title lexend">{{ member.title }}</span>
         </div>
       </div>
+
+      <div class="team-section">
+        <h3 class="pop">Website Credit</h3>
+        <div v-for="member in credit" :key="member.name" class="team-member">
+          <span class="member-name lexend-bold">{{ member.name }}</span>
+          <span class="member-title lexend">{{ member.title }}</span>
+        </div>
+      </div>
+
       <div class="team-section">
         <h3 class="pop">Social</h3>
         <div class="social-section">

@@ -17,29 +17,29 @@ let spinTween = null; // Reference to the GSAP animation for cleanup
 const personalities = {
   1: {
     name: "Marie",
-    description: "The Heart of the Band.",
-    bio: "The guiding light of the group, Marie brings harmony wherever she goes. Her gentle nature mask a fierce loyalty to her coven.",
+    description: "You're thoughtful and reserved, though you're not to be perceived as weak as your compassion comes from the kindness your soul preserves dearly in your hold. You're a person with refined taste sure but with the simple need to be understood. You long to be seen as a sister rather than a standard.",
+    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     color: "Emerald Green", likes: "Herbal Tea, Vintage Records", dislikes: "Disharmony, Cold Coffee",
     image: "/images/1-marie.png", spotify: "https://open.spotify.com/embed/playlist/61nGAiN77VagnmEQ6rvyNO?utm_source=generator"
   },
   2: {
     name: "Lyda",
-    description: "The Spark of Energy.",
-    bio: "A whirlwind of charisma and fire. Lyda never backs down from a challenge and keeps the spirits of her friends high with her infectious laughter.",
-    color: "Crimson Red", likes: "Night Runs, Spicy Food", dislikes: "Standing Still, Rain Clouds",
+    description: "You're fierce and headstrong, though this may come off as a flaw to some who might perceive you as reckless in your actions even if they are well meant. You don't require luxury, you're content being surrounded by those you declare as sisters, even if it might be hard for you to admit so at first, even to yourself.",
+    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ",
+    color: "Crimson Red", likes: "Orange Soda, Spicy Food", dislikes: "Standing Still, Rain Clouds",
     image: "/images/2-lyda.png", spotify: "https://open.spotify.com/embed/playlist/61nGAiN77VagnmEQ6rvyNO?utm_source=generator"
   },
   3: {
     name: "Vanna",
-    description: "The Ethereal Dreamer.",
-    bio: "Vanna walks between worlds. Calm and intuitive, she often sees what others miss and provides the quiet wisdom the team needs.",
-    color: "Celestial Blue", likes: "Star Gazing, Silk Scarves", dislikes: "Loud Noises, Bright Neon",
+    description: "You're creative and passionate, perhaps a bit clumsy in your craft but that has yet to hinder your fingers in any way. You desire for change and for a better tomorrow, one free of constrictions driven by fear. You let yourself belong with sisters who, like yourself, share these ideals, as you march onward to your goals.\n",
+    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    color: "Celestial Blue", likes: "Shrimps , Coffee", dislikes: "Wet Shoes",
     image: "/images/3-vanna.png", spotify: "https://open.spotify.com/embed/playlist/61nGAiN77VagnmEQ6rvyNO?utm_source=generator"
   },
   4: {
     name: "Mao",
-    description: "The Chaos Element.",
-    bio: "Unpredictable and brilliant. Mao thrives in the unknown, often finding the most creative solutions through a bit of playful trouble.",
+    description: "Huh…well, consider yourself a little fella, a friend of witches and a companion to those in need. Alternatively, meow.",
+    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ",
     color: "Midnight Violet", likes: "Shiny Trinkets, Ancient Spells", dislikes: "Rules, Early Mornings",
     image: "/images/4-cat.png", spotify: "https://open.spotify.com/embed/playlist/61nGAiN77VagnmEQ6rvyNO?utm_source=generator"
   },
@@ -176,14 +176,14 @@ function revealResult() {
         <div class="cardCont" ref="cardRef" @click="revealResult">
           <div class="cardBack" :style="{ backgroundImage: `url(${character?.image})` }"></div>
           <div class="cardFront" style="background-image: url('/images/card-back.png')">
-            <div class="click-text pop">Tap to Reveal</div>
+            <div class="click-text pop">Tap to Reveal!</div>
           </div>
         </div>
       </div>
 
       <div v-if="revealed" class="results-content">
         <div class="reveal-section result-card">
-          <h3 class="subtitle lexend">You are:</h3>
+          <h3 class="subtitle lexend">Your Character is:</h3>
           <div class="character-name-wrapper">
             <h1 class="character-name-bg pop">{{ character?.name }}</h1>
             <h1 class="character-name pop">{{ character?.name }}</h1>
@@ -202,7 +202,7 @@ function revealResult() {
         </div>
 
         <div class="reveal-section spotify-card">
-          <h4 class="pop section-title">Vibe the coven</h4>
+          <h4 class="pop section-title">Playlist</h4>
           <iframe
               style="border-radius:12px"
               :src="character?.spotify"
@@ -261,7 +261,9 @@ function revealResult() {
   z-index: 999;
   color: white;
 }
-
+.character-description{
+  margin-top: 24px;
+}
 .logo-loader {
   width: 120px;
   margin-bottom: 1.5rem;
@@ -300,11 +302,11 @@ function revealResult() {
 
 .click-text {
   position: absolute;
-  bottom: 20px;
+  top: 20px;
   width: 100%;
   text-align: center;
-  color: white;
-  background: rgba(42, 91, 189, 0.9);
+  color: #2A5BBD;
+  background: white;
   padding: 8px 0;
 }
 
@@ -314,7 +316,7 @@ function revealResult() {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: -20px;
+  margin-top: -75px;
 }
 
 .result-card { rotate: 1deg; }

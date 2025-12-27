@@ -106,7 +106,7 @@ onUnmounted(() => {
         <div class="hint-icon-circle">
           <i class="ri-music-2-fill"></i>
         </div>
-        <span>Tap the <strong>music icon</strong> to play. Tap again to mute!</span>
+        <span>Tap the <strong>anywhere</strong> to play music. Tap music icon at top left to mute!</span>
       </div>
     </Transition>
   </header>
@@ -191,7 +191,7 @@ onUnmounted(() => {
 
 .music-hint-pill {
   position: fixed;
-  bottom: 120px;
+  bottom: 24px;
   background: white;
   color: #2A5BBD;
   padding: 10px 18px;
