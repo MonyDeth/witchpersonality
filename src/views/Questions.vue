@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, nextTick, watch } from "vue";
+import { ref, computed, onMounted, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import { questions } from "../data/question.js";
 import gsap from "gsap";
@@ -11,18 +11,22 @@ const currentQuestion = computed(() => questions[currentIndex.value]);
 const progress = computed(() => ((currentIndex.value + 1) / questions.length) * 100);
 
 const selectedAnswer = ref(null);
-
 const answersContainerRef = ref(null);
+const nextButtonRef = ref(null); // Ref for the Next button
 
 function selectAnswer(personality) {
   selectedAnswer.value = personality;
+
+  // QoL: Scroll to the Next button so the user sees they can proceed
+  nextTick(() => {
+    nextButtonRef.value?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
 }
 
 function nextQuestion() {
   if (!selectedAnswer.value) return;
 
   selectedAnswers.value.push(selectedAnswer.value);
-
   const isLastQuestion = currentIndex.value === questions.length - 1;
 
   if (!answersContainerRef.value) return;
@@ -31,7 +35,7 @@ function nextQuestion() {
     y: -30,
     opacity: 0,
     duration: 0.4,
-    ease: "ease-out",
+    ease: "power2.out",
     onComplete: () => {
       if (isLastQuestion) {
         router.push({
@@ -41,6 +45,10 @@ function nextQuestion() {
       } else {
         currentIndex.value += 1;
         selectedAnswer.value = null;
+
+        // QoL: Scroll to the very top for the new question
+        window.scrollTo({ top: 0, behavior: 'slow' });
+
         nextTick(() => animateAnswersIn());
       }
     }
@@ -49,32 +57,27 @@ function nextQuestion() {
 
 function animateAnswersIn() {
   if (!answersContainerRef.value) return;
-
   gsap.fromTo(
       answersContainerRef.value,
-      { y:80, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.6, ease: "ease-out" }
+      { y: 80, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" }
   );
 }
 
-// Animate on mount
 onMounted(() => {
   nextTick(() => animateAnswersIn());
 });
 </script>
 
-
 <template>
-  <div class="page-container" >
+  <div class="page-container">
     <div class="question-box rotate-2">
       <h2 class="question-text pop">{{ currentQuestion.text }}</h2>
-
       <div class="progress-bar-container">
         <div class="progress-bar" :style="{ width: progress + '%' }"></div>
       </div>
     </div>
 
-    <!-- Answers wrapper with ref -->
     <div class="question-box answers-wrapper rotate-2" ref="answersContainerRef">
       <div class="answers">
         <button
@@ -89,6 +92,7 @@ onMounted(() => {
       </div>
 
       <button
+          ref="nextButtonRef"
           class="next-button pop"
           :disabled="!selectedAnswer"
           @click="nextQuestion"
@@ -96,7 +100,6 @@ onMounted(() => {
         Next
       </button>
     </div>
-
   </div>
 </template>
 

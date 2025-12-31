@@ -102,7 +102,7 @@ const handleMouseLeave = () => {
   justify-content: center;
   align-items: flex-start; /* Keeps content near the top/header */
   padding-top: 5dvh; /* Space between header and paper */
-  overflow: hidden;
+  //overflow: hidden;
 
 }
 
