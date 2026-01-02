@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import { personalities } from "../data/personalities.js"; // Import the data
 import gsap from "gsap";
 
 const router = useRouter();
@@ -8,42 +9,11 @@ const route = useRoute();
 
 const loading = ref(true);
 const cardRef = ref(null);
-const loaderLogoRef = ref(null); // Ref for the spinning logo
+const loaderLogoRef = ref(null);
 const character = ref(null);
 const revealed = ref(false);
 
-let spinTween = null; // Reference to the GSAP animation for cleanup
-
-const personalities = {
-  1: {
-    name: "Marie",
-    description: "You're thoughtful and reserved, though you're not to be perceived as weak as your compassion comes from the kindness your soul preserves dearly in your hold. You're a person with refined taste sure but with the simple need to be understood. You long to be seen as a sister rather than a standard.",
-    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    color: "Emerald Green", likes: "Herbal Tea, Vintage Records", dislikes: "Disharmony, Cold Coffee",
-    image: "/images/1-marie.png", spotify: "https://open.spotify.com/embed/playlist/61nGAiN77VagnmEQ6rvyNO?utm_source=generator"
-  },
-  2: {
-    name: "Lyda",
-    description: "You're fierce and headstrong, though this may come off as a flaw to some who might perceive you as reckless in your actions even if they are well meant. You don't require luxury, you're content being surrounded by those you declare as sisters, even if it might be hard for you to admit so at first, even to yourself.",
-    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ",
-    color: "Crimson Red", likes: "Orange Soda, Spicy Food", dislikes: "Standing Still, Rain Clouds",
-    image: "/images/2-lyda.png", spotify: "https://open.spotify.com/embed/playlist/61nGAiN77VagnmEQ6rvyNO?utm_source=generator"
-  },
-  3: {
-    name: "Vanna",
-    description: "You're creative and passionate, perhaps a bit clumsy in your craft but that has yet to hinder your fingers in any way. You desire for change and for a better tomorrow, one free of constrictions driven by fear. You let yourself belong with sisters who, like yourself, share these ideals, as you march onward to your goals.\n",
-    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    color: "Celestial Blue", likes: "Shrimps , Coffee", dislikes: "Wet Shoes",
-    image: "/images/3-vanna.png", spotify: "https://open.spotify.com/embed/playlist/61nGAiN77VagnmEQ6rvyNO?utm_source=generator"
-  },
-  4: {
-    name: "Mao",
-    description: "Huh…well, consider yourself a little fella, a friend of witches and a companion to those in need. Alternatively, meow.",
-    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ",
-    color: "Midnight Violet", likes: "Shiny Trinkets, Ancient Spells", dislikes: "Rules, Early Mornings",
-    image: "/images/4-cat.png", spotify: "https://open.spotify.com/embed/playlist/61nGAiN77VagnmEQ6rvyNO?utm_source=generator"
-  },
-};
+let spinTween = null;
 
 onMounted(async () => {
   // Start the spin animation immediately
@@ -74,6 +44,7 @@ onMounted(async () => {
     }
   }
 
+  // Use the imported personalities object
   character.value = personalities[maxKey] || personalities[1];
 
   // Simulated loading delay
@@ -83,12 +54,10 @@ onMounted(async () => {
 });
 
 function stopLoading() {
-  // KILL the animation instance to save memory
   if (spinTween) {
     spinTween.kill();
     spinTween = null;
   }
-
   loading.value = false;
   nextTick(() => {
     animateCardEntry();
@@ -96,14 +65,14 @@ function stopLoading() {
 }
 
 onUnmounted(() => {
-  // Safety cleanup
   if (spinTween) spinTween.kill();
 });
+
+
 
 // --- ANIMATIONS ---
 function animateCardEntry() {
   const tl = gsap.timeline();
-
   tl.from(cardRef.value, {
     y: 100,
     opacity: 0,
@@ -112,7 +81,6 @@ function animateCardEntry() {
     duration: 1.2,
     ease: "power3.out"
   });
-
   tl.to(cardRef.value, {
     y: "-=15",
     duration: 2.5,
@@ -124,9 +92,7 @@ function animateCardEntry() {
 
 function revealResult() {
   if (revealed.value) return;
-
   const tl = gsap.timeline();
-
   tl.to(cardRef.value, {
     rotationY: 180,
     y: 0,
@@ -134,9 +100,7 @@ function revealResult() {
     duration: 0.8,
     ease: "power2.inOut"
   });
-
   revealed.value = true;
-
   nextTick(() => {
     gsap.from(".reveal-section", {
       y: 100,
@@ -147,7 +111,6 @@ function revealResult() {
       ease: "back.out(1.2)",
       clearProps: "all"
     });
-
     gsap.from(".restart-btn", {
       opacity: 0,
       scale: 0.8,
@@ -156,6 +119,25 @@ function revealResult() {
     });
   });
 }
+
+const copyLink = () => {
+  // Point to home page so the link is accessible to new users
+  const homeUrl = window.location.origin;
+  navigator.clipboard.writeText(homeUrl).then(() => {
+    alert("Link to quiz copied!");
+  });
+};
+
+const shareToX = () => {
+  const title = `I got ${character.value.name}! A Witch's Stop personality`;
+  const description = `Find who you relate to most with the A Witch's Stop personality quiz! By Nompang Studios`;
+  const homeUrl = window.location.origin;
+
+  const shareText = `${title}\n${description}`;
+  const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(homeUrl)}`;
+
+  window.open(xUrl, '_blank');
+};
 </script>
 
 <template>
@@ -193,7 +175,6 @@ function revealResult() {
 
         <div class="reveal-section info-card">
           <h4 class="pop section-title">Preferences</h4>
-          <p class="lexend bio-text">{{ character?.bio }}</p>
           <div class="stats-list lexend">
             <p><strong class="lexend-bold">Favorite Color:</strong> {{ character?.color }}</p>
             <p><strong class="lexend-bold">Likes:</strong> {{ character?.likes }}</p>
@@ -212,6 +193,17 @@ function revealResult() {
               allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
               loading="lazy">
           </iframe>
+        </div>
+        <div class="reveal-section share-card">
+          <h4 class="pop section-title">Share Result</h4>
+          <div class="share-grid">
+            <button @click="copyLink" class="share-btn lexend-bold">
+              <i class="ri-links-line"></i> Copy Link
+            </button>
+            <button @click="shareToX" class="share-btn x-style lexend-bold">
+              <i class="ri-twitter-x-fill"></i> Post
+            </button>
+          </div>
         </div>
 
         <button @click="router.push('/')" class="restart-btn pop">Restart Test</button>
@@ -309,6 +301,9 @@ function revealResult() {
   background: white;
   padding: 8px 0;
 }
+.icon{
+  width: 18px;
+}
 
 /* RESULT SECTIONS */
 .results-content {
@@ -369,4 +364,50 @@ function revealResult() {
 }
 
 .footer-spacer { height: 10vh; }
+
+.share-card {
+  rotate: -1deg;
+  text-align: left;
+}
+
+.share-desc {
+  font-size: 0.8rem;
+  opacity: 0.8;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+.share-grid {
+  display: flex;
+  gap: 10px;
+}
+
+.share-btn {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid #2A5BBD;
+  background: white;
+  color: #2A5BBD;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.share-btn:hover {
+  background: #f0f4ff;
+  transform: translateY(-2px);
+}
+
+.x-style {
+  background: #2A5BBD;
+  color: white;
+}
+
+.x-style:hover {
+  background: #1a47a1;
+}
 </style>

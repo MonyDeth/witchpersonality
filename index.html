@@ -8,7 +8,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+
     <title>A Witch's Stop Personality Test</title>
+    <meta name="title" content="A Witch's Stop Personality Test">
+    <meta name="description" content="Find who you relate to most with the A Witch's Stop personality quiz! By Nompang Studios">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://your-site-url.vercel.app/">
+    <meta property="og:title" content="A Witch's Stop Personality Quiz">
+    <meta property="og:description" content="Find who you relate to most with the A Witch's Stop personality quiz! By Nompang Studios">
+    <meta property="og:image" content="https://your-site-url.vercel.app/og-thumbnail.png">
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://your-site-url.vercel.app/">
+    <meta property="twitter:title" content="A Witch's Stop Personality Quiz">
+    <meta property="twitter:description" content="Find who you relate to most with the A Witch's Stop personality quiz! By Nompang Studios">
+    <meta property="twitter:image" content="https://your-site-url.vercel.app/og-thumbnail.png">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
@@ -40,7 +55,6 @@
             margin-bottom: 30px;
         }
 
-        /* Actual Progress Container */
         .progress-container {
             width: 100%;
             display: flex;
@@ -63,7 +77,7 @@
             left: 0;
             top: 0;
             height: 100%;
-            width: 0; /* Controlled by JS */
+            width: 0;
             background: #FFFFFF;
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
             transition: width 0.3s ease-out;
@@ -73,7 +87,7 @@
             font-size: 0.8rem;
             letter-spacing: 2px;
             font-weight: 600;
-            text-align: center; /* Explicitly center the percentage */
+            text-align: center;
             width: 100%;
         }
 
@@ -83,9 +97,10 @@
             font-weight: 600;
             margin-top: 5px;
             height: 1.2rem;
-            text-align: center; /* Explicitly center the status text */
+            text-align: center;
             width: 100%;
         }
+
         @media (max-width: 768px) {
             .loading-logo { width: 140px; }
             .loader-content { width: 180px; }
@@ -116,20 +131,15 @@
         const statusText = document.getElementById('status-text');
         const loader = document.getElementById('initial-loader');
 
-        // Check if returning user
         if (localStorage.getItem('nompang_has_visited')) {
             loader.style.display = 'none';
             return;
         }
 
-        // 1. Initial Logo Fade In
         gsap.to("#loader-logo", { opacity: 1, duration: 1, ease: "power2.out" });
 
-        // 2. Track Loading Progress
-        // We simulate the progress based on internal browser loading events
         let progress = 0;
         const interval = setInterval(() => {
-            // Incremental progress while waiting for 'window.load'
             if (progress < 90) {
                 progress += Math.random() * 15;
                 if (progress > 90) progress = 90;
@@ -146,11 +156,10 @@
             clearInterval(interval);
             updateUI(100);
             statusText.innerText = "Good to brew!";
-            statusText.style.color = "#FFFFFF"; // Minty green success color
+            statusText.style.color = "#FFFFFF";
 
-            // 3. Final Transition
             const tl = gsap.timeline({
-                delay: 0.8, // Let them read "Good to brew!"
+                delay: 0.8,
                 onComplete: () => {
                     loader.remove();
                     localStorage.setItem('nompang_has_visited', 'true');

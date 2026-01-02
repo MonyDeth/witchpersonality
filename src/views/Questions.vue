@@ -3,6 +3,7 @@ import { ref, computed, onMounted, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import { questions } from "../data/question.js";
 import gsap from "gsap";
+import clickSfx from "../assets/audio/sfx_click.mp3";
 
 const router = useRouter();
 const selectedAnswers = ref([]);
@@ -12,12 +13,20 @@ const progress = computed(() => ((currentIndex.value + 1) / questions.length) * 
 
 const selectedAnswer = ref(null);
 const answersContainerRef = ref(null);
-const nextButtonRef = ref(null); // Ref for the Next button
+const nextButtonRef = ref(null);
+
+const playClickSfx = () => {
+  const audio = new Audio(clickSfx);
+  audio.volume = 0.5;
+  audio.play();
+};
 
 function selectAnswer(personality) {
+  // Play SFX on selection
+  playClickSfx();
+
   selectedAnswer.value = personality;
 
-  // QoL: Scroll to the Next button so the user sees they can proceed
   nextTick(() => {
     nextButtonRef.value?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
@@ -25,6 +34,9 @@ function selectAnswer(personality) {
 
 function nextQuestion() {
   if (!selectedAnswer.value) return;
+
+  // Play SFX when hitting Next
+  playClickSfx();
 
   selectedAnswers.value.push(selectedAnswer.value);
   const isLastQuestion = currentIndex.value === questions.length - 1;
@@ -46,8 +58,8 @@ function nextQuestion() {
         currentIndex.value += 1;
         selectedAnswer.value = null;
 
-        // QoL: Scroll to the very top for the new question
-        window.scrollTo({ top: 0, behavior: 'slow' });
+        // Changed 'slow' to 'smooth' (standard browser API)
+        window.scrollTo({ top: 0, behavior: 'smooth' });
 
         nextTick(() => animateAnswersIn());
       }
