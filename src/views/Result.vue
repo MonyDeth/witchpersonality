@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { personalities } from "../data/personalities.js"; // Import the data
+import { personalities } from "../data/personalities.js";
 import gsap from "gsap";
 
 const router = useRouter();
@@ -12,6 +12,7 @@ const cardRef = ref(null);
 const loaderLogoRef = ref(null);
 const character = ref(null);
 const revealed = ref(false);
+const toastVisible = ref(false);
 
 let spinTween = null;
 
@@ -47,7 +48,7 @@ onMounted(async () => {
   // Use the imported personalities object
   character.value = personalities[maxKey] || personalities[1];
 
-  // Simulated loading delay
+  // Simulated loading delay to ensure assets are ready
   setTimeout(() => {
     stopLoading();
   }, 2500);
@@ -68,7 +69,62 @@ onUnmounted(() => {
   if (spinTween) spinTween.kill();
 });
 
+// --- SHARING LOGIC ---
+const getShareContent = () => {
+  const url = window.location.origin;
+  const title = `I got ${character.value?.name}! A Witch's Stop personality`;
+  const desc = `Find who you relate to most with the A Witch's Stop personality quiz! By Nompang Studios`;
+  return { url, title, desc, fullText: `${title}\n${desc}` };
+};
 
+const copyLink = () => {
+  const { url } = getShareContent();
+  navigator.clipboard.writeText(url).then(() => {
+    showToast();
+  });
+};
+
+const showToast = () => {
+  toastVisible.value = true;
+  nextTick(() => {
+    gsap.fromTo(".toast-msg",
+        { y: 50, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4, ease: "back.out(1.7)" }
+    );
+
+    setTimeout(() => {
+      gsap.to(".toast-msg", {
+        y: 20,
+        opacity: 0,
+        duration: 0.4,
+        onComplete: () => { toastVisible.value = false; }
+      });
+    }, 2000);
+  });
+};
+
+const shareToX = () => {
+  const { url, fullText } = getShareContent();
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(fullText)}&url=${encodeURIComponent(url)}`, '_blank');
+};
+
+const shareToFB = () => {
+  const { url } = getShareContent();
+  window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+};
+
+const shareDevice = async () => {
+  const { url, title, fullText } = getShareContent();
+  if (navigator.share) {
+    try {
+      await navigator.share({ title, text: fullText, url });
+    } catch (err) {
+      console.log("Share failed", err);
+    }
+  } else {
+    copyLink();
+  }
+};
 
 // --- ANIMATIONS ---
 function animateCardEntry() {
@@ -119,25 +175,6 @@ function revealResult() {
     });
   });
 }
-
-const copyLink = () => {
-  // Point to home page so the link is accessible to new users
-  const homeUrl = window.location.origin;
-  navigator.clipboard.writeText(homeUrl).then(() => {
-    alert("Link to quiz copied!");
-  });
-};
-
-const shareToX = () => {
-  const title = `I got ${character.value.name}! A Witch's Stop personality`;
-  const description = `Find who you relate to most with the A Witch's Stop personality quiz! By Nompang Studios`;
-  const homeUrl = window.location.origin;
-
-  const shareText = `${title}\n${description}`;
-  const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(homeUrl)}`;
-
-  window.open(xUrl, '_blank');
-};
 </script>
 
 <template>
@@ -194,14 +231,21 @@ const shareToX = () => {
               loading="lazy">
           </iframe>
         </div>
+
         <div class="reveal-section share-card">
           <h4 class="pop section-title">Share Result</h4>
-          <div class="share-grid">
-            <button @click="copyLink" class="share-btn lexend-bold">
-              <i class="ri-links-line"></i> Copy Link
+          <div class="share-icon-row">
+            <button @click="shareToX" class="icon-btn x-bg" title="Share on X">
+              <i class="ri-twitter-x-fill"></i>
             </button>
-            <button @click="shareToX" class="share-btn x-style lexend-bold">
-              <i class="ri-twitter-x-fill"></i> Post
+            <button @click="shareToFB" class="icon-btn fb-bg" title="Share on Facebook">
+              <i class="ri-facebook-fill"></i>
+            </button>
+            <button @click="copyLink" class="icon-btn copy-bg" title="Copy Link">
+              <i class="ri-link"></i>
+            </button>
+            <button @click="shareDevice" class="icon-btn device-bg" title="More Options">
+              <i class="ri-share-forward-fill"></i>
             </button>
           </div>
         </div>
@@ -209,8 +253,15 @@ const shareToX = () => {
         <button @click="router.push('/')" class="restart-btn pop">Restart Test</button>
         <div class="footer-spacer"></div>
       </div>
-
     </section>
+
+    <Transition name="fade">
+      <div v-if="toastVisible" class="toast-container">
+        <div class="toast-msg pop">
+          <i class="ri-magic-fill"></i> Link Copied!
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -223,6 +274,7 @@ const shareToX = () => {
   width: 100%;
   background: #2A5BBD;
   overflow: hidden;
+  position: relative;
 }
 
 .landing-mobile-screen {
@@ -252,9 +304,6 @@ const shareToX = () => {
   align-items: center;
   z-index: 999;
   color: white;
-}
-.character-description{
-  margin-top: 24px;
 }
 .logo-loader {
   width: 120px;
@@ -301,9 +350,6 @@ const shareToX = () => {
   background: white;
   padding: 8px 0;
 }
-.icon{
-  width: 18px;
-}
 
 /* RESULT SECTIONS */
 .results-content {
@@ -342,6 +388,8 @@ const shareToX = () => {
 .character-name { color: white; z-index: 2; -webkit-text-stroke: 6px #2A5BBD; paint-order: stroke fill; }
 .character-name-bg { color: #2A5BBD; z-index: 1; transform: translateY(5px); -webkit-text-stroke: 6px #2A5BBD; }
 
+.character-description { margin-top: 24px; font-size: 0.95rem; line-height: 1.6; }
+
 .section-title {
   font-size: 1.1rem;
   border-bottom: 2px dashed #2A5BBD;
@@ -349,8 +397,7 @@ const shareToX = () => {
   display: inline-block;
 }
 
-.bio-text { font-size: 0.9rem; line-height: 1.6; }
-.stats-list p { font-size: 0.85rem; margin: 5px 0; }
+.stats-list p { font-size: 0.85rem; margin: 8px 0; }
 
 .restart-btn {
   background: white;
@@ -363,51 +410,68 @@ const shareToX = () => {
   font-weight: bold;
 }
 
-.footer-spacer { height: 10vh; }
-
+/* SHARE STYLES */
 .share-card {
   rotate: -1deg;
-  text-align: left;
+  text-align: center;
 }
 
-.share-desc {
-  font-size: 0.8rem;
-  opacity: 0.8;
-  margin-bottom: 1rem;
-  line-height: 1.4;
-}
-
-.share-grid {
+.share-icon-row {
   display: flex;
-  gap: 10px;
+  justify-content: center;
+  gap: 12px;
+  margin: 10px 0;
 }
 
-.share-btn {
-  flex: 1;
-  padding: 12px;
-  border: 2px solid #2A5BBD;
-  background: white;
-  color: #2A5BBD;
-  cursor: pointer;
+.icon-btn {
+  width: 48px;
+  height: 48px;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  font-size: 0.9rem;
-  transition: transform 0.2s, background 0.2s;
-}
-
-.share-btn:hover {
-  background: #f0f4ff;
-  transform: translateY(-2px);
-}
-
-.x-style {
-  background: #2A5BBD;
+  font-size: 1.3rem;
+  cursor: pointer;
   color: white;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 4px 4px 0 rgba(0,0,0,.25);
 }
 
-.x-style:hover {
-  background: #1a47a1;
+.icon-btn:hover {
+  transform: scale(1.1) translateY(-3px);
+  box-shadow: 6px 6px 0 rgba(0,0,0,0.25);
 }
+
+.x-bg { background-color: #000000; }
+.fb-bg { background-color: #1877F2; }
+.copy-bg { background-color: #2A5BBD; }
+.device-bg { background-color: #2A5BBD; color: white; }
+
+/* TOAST STYLES */
+.toast-container {
+  position: fixed;
+  bottom: 80px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.toast-msg {
+  background: #1a408a;
+  color: white;
+  padding: 12px 24px;
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: bold;
+}
+
+.fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+
+.footer-spacer { height: 10vh; }
 </style>
